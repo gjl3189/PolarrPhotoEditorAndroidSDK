@@ -1,9 +1,8 @@
 # Polarr Photo Editor Android SDK
-The Polarr Photo Editor Android SDK exposes a subset of the native OpenGL rendering APIs used by Polarr Photo Editor. This SDK includes a starter project (app) that calls the Android SDK and users can try out the available editing tools. This repo is intended to demonstrate a subset of the capabilities of the full Android SDK. 
+The Polarr Photo Editor Android SDK exposes a subset of the native OpenGL rendering APIs used by [Polarr Photo Editor](https://play.google.com/store/apps/details?id=photo.editor.polarr). This SDK includes a starter project (app) that calls the Android SDK and users can try out the available editing tools. This repo is intended to demonstrate a subset of the capabilities of the full Android SDK and must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The SDK packages expires on September 30, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
 
 The minimum Android API Level is 14 (4.0.3).
 
-The SDK in this repo expires on September 30, 2017. For pricing and more info regarding the full license SDK, please email info@polarr.co.
 
 ## Init GLRenderView
 ```xml
