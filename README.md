@@ -100,3 +100,23 @@ renderView.exportImageData(needImage, new OnExportCallback() {
 "luminance_purple",
 "luminance_magenta",
 ```
+## Render View movements
+Change position
+```java
+float offsetX = 10.0f;
+float offsetY = 5.5f;
+renderView.setPosition(offsetX, offsetY);
+```
+Get current zoom
+```java
+float mZoom = renderView.getZoom();
+```
+Get minimum zoom. If current zoom less than minimum zoom, the image will be too small to fit the view size.
+```java
+float minZoom = renderView.getMinZoom();
+```
+Set zoom
+```java
+float mZoom = 1.2f;
+renderView.setZoom(mZoom);
+```
