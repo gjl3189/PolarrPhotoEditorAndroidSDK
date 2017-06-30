@@ -100,7 +100,7 @@ renderView.exportImageData(needImage, new OnExportCallback() {
 "luminance_purple",
 "luminance_magenta",
 ```
-## Render View movements
+## Render view movements
 Change position
 ```java
 float offsetX = 10.0f;
