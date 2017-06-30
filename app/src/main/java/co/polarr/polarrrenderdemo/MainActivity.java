@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Render View
      */
-    private GLRenderView renderView;
+    private CustomRenderView renderView;
     /**
      * adjustment container
      */
@@ -86,29 +86,29 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         // init render view
-        renderView = (GLRenderView) findViewById(R.id.render_view);
+        renderView = (CustomRenderView) findViewById(R.id.render_view);
 
-        // add on touch event to show original image
-        renderView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        renderView.showOriginal(true);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        renderView.showOriginal(false);
-                        break;
-                    default:
-                        return false;
-                }
-
-                return true;
-            }
-        });
+//        // add on touch event to show original image
+//        renderView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getActionMasked()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        renderView.showOriginal(true);
+//                        break;
+//                    case MotionEvent.ACTION_MOVE:
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                    case MotionEvent.ACTION_CANCEL:
+//                        renderView.showOriginal(false);
+//                        break;
+//                    default:
+//                        return false;
+//                }
+//
+//                return true;
+//            }
+//        });
 
         // post init render view
         ThreadManager.executeOnMainThread(new Runnable() {

@@ -45,7 +45,7 @@
         </LinearLayout>
 
 
-        <co.polarr.renderer.render.GLRenderView
+        <co.polarr.polarrrenderdemo.CustomRenderView
             android:id="@+id/render_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
