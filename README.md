@@ -9,6 +9,11 @@ The minimum Android API Level is 14 (4.0.3).
 ## License
 The SDK included in this repository must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The current version of the SDK expires on September 30, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
 
+## Functionalities
+The current SDK includes everything as seen in Polarr Photo Editor's global adjustment panel
+![sdk](https://user-images.githubusercontent.com/806199/27817613-efbf57be-6046-11e7-915c-7d8a48c4a716.jpg)
+
+# Sample Usage
 
 ## Init GLRenderView
 ```xml
