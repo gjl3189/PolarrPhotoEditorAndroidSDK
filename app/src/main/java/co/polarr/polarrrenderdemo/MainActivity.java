@@ -255,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
                 "luminance_blue",
                 "luminance_purple",
                 "luminance_magenta",
+                "grain_amount",
+                "grain_size",
         };
 
 
