@@ -164,6 +164,15 @@ renderView.setZoom(mZoom);
 String statesString = QRCodeUtil.requestQRJson("http://www.polaxiong.com/users/custom_filter/1557497");
 renderView.updateShaderWithStatesJson(statesString);
 ```
+### QR code import from a image
+```java
+String qrImagePath;
+String qrCodeData = QRUtils.decodeImageQRCode(context, qrImagePath);
+  
+// run on asyncronized thread
+String statesString = QRCodeUtil.requestQRJson(qrCodeData);
+renderView.updateShaderWithStatesJson(statesString);
+```
 ### QR code scan and request
 ```java
 Intent intent = new Intent(this, QRScannerActivity.class);

@@ -32,14 +32,17 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import co.polarr.qrcode.QRUtils;
 import co.polarr.renderer.render.OnExportCallback;
 import co.polarr.renderer.utils.QRCodeUtil;
+import co.polarr.utils.FileUtils;
 import co.polarr.utils.ImageLoadUtil;
 import co.polarr.utils.Logger;
 import co.polarr.utils.ThreadManager;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_IMPORT_PHOTO = 1;
+    private static final int REQUEST_IMPORT_QR_PHOTO = 2;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private static final int ACTIVITY_RESULT_QR_SCANNER = 2;
     private AppCompatSeekBar seekbar;
@@ -113,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_IMPORT_PHOTO);
     }
 
+    private void importQrImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_IMPORT_QR_PHOTO);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_IMPORT_PHOTO == requestCode) {
@@ -122,6 +131,20 @@ public class MainActivity extends AppCompatActivity {
                 int maxTextureSize = ImageLoadUtil.getMaxTextureSize();
                 Bitmap imageBm = ImageLoadUtil.decodeThumbBitmapFromUrl(this, uri, maxTextureSize, maxTextureSize, orientation);
                 renderView.importImage(imageBm);
+            }
+        } else if (REQUEST_IMPORT_QR_PHOTO == requestCode && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                final String qrCodeData = QRUtils.decodeImageQRCode(this, FileUtils.getPath(this, uri));
+                if (qrCodeData != null) {
+                    ThreadManager.executeOnAsyncThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String statesString = QRCodeUtil.requestQRJson(qrCodeData);
+                            updateQrStates(statesString);
+                        }
+                    });
+                }
             }
         } else if (ACTIVITY_RESULT_QR_SCANNER == requestCode && resultCode == RESULT_OK) {
             if (data == null || data.getStringExtra("value") == null) {
@@ -311,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
                 "Reset image",
                 "Export image",
                 "Qr scan",
+                "Import qr code image",
         };
 
         adb.setItems(items, new DialogInterface.OnClickListener() {
@@ -332,6 +356,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
                         showQRScan();
+                        break;
+                    case 5:
+                        importQrImage();
                         break;
                 }
                 dialog.dismiss();
