@@ -18,7 +18,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -33,16 +32,16 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import co.polarr.renderer.render.GLRenderView;
 import co.polarr.renderer.render.OnExportCallback;
+import co.polarr.renderer.utils.QRCodeUtil;
 import co.polarr.utils.ImageLoadUtil;
 import co.polarr.utils.Logger;
 import co.polarr.utils.ThreadManager;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final int REQUEST_IMPORT_PHOTO = 1;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private static final int ACTIVITY_RESULT_QR_SCANNER = 2;
     private AppCompatSeekBar seekbar;
     private TextView labelTv;
 
@@ -88,28 +87,6 @@ public class MainActivity extends AppCompatActivity {
         // init render view
         renderView = (CustomRenderView) findViewById(R.id.render_view);
 
-//        // add on touch event to show original image
-//        renderView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getActionMasked()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        renderView.showOriginal(true);
-//                        break;
-//                    case MotionEvent.ACTION_MOVE:
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                    case MotionEvent.ACTION_CANCEL:
-//                        renderView.showOriginal(false);
-//                        break;
-//                    default:
-//                        return false;
-//                }
-//
-//                return true;
-//            }
-//        });
-
         // post init render view
         ThreadManager.executeOnMainThread(new Runnable() {
             @Override
@@ -146,6 +123,19 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap imageBm = ImageLoadUtil.decodeThumbBitmapFromUrl(this, uri, maxTextureSize, maxTextureSize, orientation);
                 renderView.importImage(imageBm);
             }
+        } else if (ACTIVITY_RESULT_QR_SCANNER == requestCode && resultCode == RESULT_OK) {
+            if (data == null || data.getStringExtra("value") == null) {
+                return;
+            }
+            final String urlString = data.getStringExtra("value");
+
+            ThreadManager.executeOnAsyncThread(new Runnable() {
+                @Override
+                public void run() {
+                    String statesString = QRCodeUtil.requestQRJson(urlString);
+                    updateQrStates(statesString);
+                }
+            });
         }
     }
 
@@ -194,12 +184,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void showQRScan() {
+        Intent intent = new Intent(this, QRScannerActivity.class);
+        startActivityForResult(intent, ACTIVITY_RESULT_QR_SCANNER);
+    }
+
+    private void updateQrStates(String statesString) {
+        // reset to default
+        renderView.resetAll();
+        renderView.updateShaderWithStatesJson(statesString);
+    }
+
     private void reset() {
         renderView.resetAll();
     }
 
     private void initRenderView() {
-        renderView.initRender();
         renderView.setRenderBackgroundColor(Color.WHITE);
     }
 
@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
                 "Import demo",
                 "Reset image",
                 "Export image",
+                "Qr scan",
         };
 
         adb.setItems(items, new DialogInterface.OnClickListener() {
@@ -328,6 +329,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         exportImage();
+                        break;
+                    case 4:
+                        showQRScan();
                         break;
                 }
                 dialog.dismiss();

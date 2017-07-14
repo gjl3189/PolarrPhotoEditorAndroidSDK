@@ -18,6 +18,26 @@ The current SDK includes everything as seen in Polarr Photo Editor's global adju
 
 Below are code samples and function calls to use the SDK
 
+## Add dependencies to Gradle
+### Required
+```groovy
+// render sdk
+compile (name: 'renderer-release', ext: 'aar')
+  
+// render utils
+compile (name: 'utils-release', ext: 'aar')
+    
+// fast json decoder used by render sdk
+compile 'com.alibaba:fastjson:1.1.55.android'
+```
+### Optional
+```groovy
+// qr code scanner and decoder
+compile (name: 'qrcode-release', ext: 'aar')
+ 
+// qr code
+compile 'com.google.zxing:core:3.2.1'
+```
 ## Init GLRenderView
 ```xml
 <co.polarr.renderer.render.GLRenderView
@@ -135,4 +155,35 @@ Set zoom
 ```java
 float mZoom = 1.2f;
 renderView.setZoom(mZoom);
+```
+
+## QR code
+### QR code request from a url
+```java
+// run on asyncronized thread
+String statesString = QRCodeUtil.requestQRJson("http://www.polaxiong.com/users/custom_filter/1557497");
+renderView.updateShaderWithStatesJson(statesString);
+```
+### QR code scan and request
+```java
+Intent intent = new Intent(this, QRScannerActivity.class);
+startActivityForResult(intent, ACTIVITY_RESULT_QR_SCANNER);
+ 
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (ACTIVITY_RESULT_QR_SCANNER == requestCode && resultCode == RESULT_OK) {
+        if (data == null || data.getStringExtra("value") == null) {
+            return;
+        }
+        final String urlString = data.getStringExtra("value");
+
+        ThreadManager.executeOnAsyncThread(new Runnable() {
+            @Override
+            public void run() {
+                String statesString = QRCodeUtil.requestQRJson(urlString);
+                renderView.updateShaderWithStatesJson(statesString);
+            }
+        });
+    }
+}
 ```

@@ -6,4 +6,5 @@
     <string name="image_reset">Reset</string>
     <string name="image_import">Import Photo</string>
     <string name="image_import_demo">Demo Photo</string>
+    <string name="title_qr">QR Scan</string>
 </resources>

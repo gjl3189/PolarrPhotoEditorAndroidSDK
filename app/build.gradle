@@ -37,4 +37,10 @@ dependencies {
 
     compile (name: 'renderer-release', ext: 'aar')
     compile (name: 'utils-release', ext: 'aar')
+    compile (name: 'qrcode-release', ext: 'aar')
+
+    // fast json decoder
+    compile 'com.alibaba:fastjson:1.1.55.android'
+    // qr code
+    compile 'com.google.zxing:core:3.2.1'
 }
