@@ -12,7 +12,7 @@
 ## 功能模块
 本SDK包含了泼辣修图App里面的全局调整功能。以下是泼辣修图的全局调整面板：
 
-![sdk](https://files.slack.com/files-tmb/T034U993N-F6CAXM9ML-c650237db5/_________345456-2_720.jpg)
+![sdk](https://user-images.githubusercontent.com/5923363/28428260-6f90ca4c-6dab-11e7-8136-67498e369665.png)
 
 # 易用性
 
