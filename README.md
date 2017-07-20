@@ -15,6 +15,7 @@ The current SDK includes everything as seen in Polarr Photo Editor's global adju
 ![sdk](https://user-images.githubusercontent.com/806199/27817613-efbf57be-6046-11e7-915c-7d8a48c4a716.jpg)
 
 Starter project
+
 ![Starter project](https://user-images.githubusercontent.com/5923363/28439929-bcdd097a-6dd6-11e7-8456-beef54bfaac8.gif)
 
 # Sample Usage
