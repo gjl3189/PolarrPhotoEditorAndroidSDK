@@ -14,6 +14,9 @@
 
 ![sdk](https://user-images.githubusercontent.com/5923363/28428260-6f90ca4c-6dab-11e7-8136-67498e369665.png)
 
+示例工程
+![示例工程](https://user-images.githubusercontent.com/5923363/28439929-bcdd097a-6dd6-11e7-8456-beef54bfaac8.gif)
+
 # 易用性
 
 几行代码即可接入本SDK
