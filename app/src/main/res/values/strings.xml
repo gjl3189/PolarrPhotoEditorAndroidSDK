@@ -2,7 +2,7 @@
     <string name="app_name">RenderDemo</string>
     <string name="title_menu">Menu</string>
     <string name="title_list">Adjustments</string>
-    <string name="desc_home">Polarr image render SDK.\nTouch image to show original.</string>
+    <string name="desc_home">Polarr image render SDK.</string>
     <string name="image_reset">Reset</string>
     <string name="image_import">Import Photo</string>
     <string name="image_import_demo">Demo Photo</string>

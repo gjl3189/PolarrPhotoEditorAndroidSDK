@@ -1,15 +1,14 @@
 package co.polarr.polarrrenderdemo;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -21,37 +20,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import co.polarr.qrcode.QRUtils;
-import co.polarr.renderer.render.OnExportCallback;
 import co.polarr.renderer.utils.QRCodeUtil;
-import co.polarr.utils.FileUtils;
-import co.polarr.utils.ImageLoadUtil;
-import co.polarr.utils.Logger;
-import co.polarr.utils.ThreadManager;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_IMPORT_PHOTO = 1;
     private static final int REQUEST_IMPORT_QR_PHOTO = 2;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-    private static final int ACTIVITY_RESULT_QR_SCANNER = 2;
+    private static final int ACTIVITY_RESULT_QR_SCANNER = 3;
     private AppCompatSeekBar seekbar;
     private TextView labelTv;
 
     /**
      * Render View
      */
-    private CustomRenderView renderView;
+    private DemoView renderView;
     /**
      * adjustment container
      */
@@ -59,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * save adjustment values
      */
-    private Map<String, Integer> localStateMap = new HashMap<>();
+    private Map<String, Object> localStateMap = new HashMap<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -88,15 +77,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         // init render view
-        renderView = (CustomRenderView) findViewById(R.id.render_view);
-
-        // post init render view
-        ThreadManager.executeOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                initRenderView();
-            }
-        });
+        renderView = (DemoView) findViewById(R.id.render_view);
 
         sliderCon = findViewById(R.id.slider);
         sliderCon.setVisibility(View.GONE);
@@ -107,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importImageDemo() {
-        renderView.importImage(BitmapFactory.decodeResource(getResources(), R.mipmap.demo));
+        Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo);
+        renderView.importImage(imageBm);
     }
 
     private void importImage() {
@@ -127,23 +109,30 @@ public class MainActivity extends AppCompatActivity {
         if (REQUEST_IMPORT_PHOTO == requestCode) {
             if (data != null) {
                 Uri uri = data.getData();
-                int orientation = ImageLoadUtil.getOrientation(this, uri);
-                int maxTextureSize = ImageLoadUtil.getMaxTextureSize();
-                Bitmap imageBm = ImageLoadUtil.decodeThumbBitmapFromUrl(this, uri, maxTextureSize, maxTextureSize, orientation);
-                renderView.importImage(imageBm);
+                final Bitmap imageBm = decodeBitmapFromUri(this, uri);
+                renderView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        renderView.importImage(imageBm);
+                    }
+                });
             }
         } else if (REQUEST_IMPORT_QR_PHOTO == requestCode && resultCode == RESULT_OK) {
             if (data != null) {
                 Uri uri = data.getData();
-                final String qrCodeData = QRUtils.decodeImageQRCode(this, FileUtils.getPath(this, uri));
+                File file = new File(uri.toString());
+
+
+                final String qrCodeData = QRUtils.decodeImageQRCode(this, file.getPath());
                 if (qrCodeData != null) {
-                    ThreadManager.executeOnAsyncThread(new Runnable() {
+
+                    new Thread() {
                         @Override
                         public void run() {
                             String statesString = QRCodeUtil.requestQRJson(qrCodeData);
                             updateQrStates(statesString);
                         }
-                    });
+                    }.start();
                 }
             }
         } else if (ACTIVITY_RESULT_QR_SCANNER == requestCode && resultCode == RESULT_OK) {
@@ -151,15 +140,27 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             final String urlString = data.getStringExtra("value");
-
-            ThreadManager.executeOnAsyncThread(new Runnable() {
+            new Thread() {
                 @Override
                 public void run() {
                     String statesString = QRCodeUtil.requestQRJson(urlString);
                     updateQrStates(statesString);
                 }
-            });
+            }.start();
         }
+    }
+
+    private static Bitmap decodeBitmapFromUri(Context context, Uri uri) {
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            Bitmap decodedBm = BitmapFactory.decodeStream(inputStream);
+            Bitmap formatedBm = decodedBm.copy(Bitmap.Config.ARGB_8888, false);
+            decodedBm.recycle();
+            return formatedBm;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void exportImage() {
@@ -174,37 +175,37 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        renderView.exportImageData(false, new OnExportCallback() {
-            @Override
-            public void onExport(Bitmap bitmap, byte[] array) {
-                try {
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                    File storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PolarrDemo");
-
-                    //Creating the storage directory if it doesn't exist
-                    if (!storageDirectory.exists()) {
-                        storageDirectory.mkdirs();
-                    }
-
-                    //Creating the temporary storage file
-                    File targetImagePath = File.createTempFile(timeStamp + "_", ".jpg", storageDirectory);
-
-                    OutputStream outputStream = new FileOutputStream(targetImagePath);
-
-                    outputStream.write(array);
-                    outputStream.close();
-
-                    //Rescanning the icon_library/gallery so it catches up with our own changes
-                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    mediaScanIntent.setData(Uri.fromFile(targetImagePath));
-                    sendBroadcast(mediaScanIntent);
-
-                    Toast.makeText(MainActivity.this, String.format(Locale.ENGLISH, "Saved to: %s", targetImagePath.getAbsolutePath()), Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    Logger.e("Cannot save exporting file to disk (" + e.toString() + ").");
-                }
-            }
-        });
+//        renderView.exportImageData(false, new OnExportCallback() {
+//            @Override
+//            public void onExport(Bitmap bitmap, byte[] array) {
+//                try {
+//                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//                    File storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PolarrDemo");
+//
+//                    //Creating the storage directory if it doesn't exist
+//                    if (!storageDirectory.exists()) {
+//                        storageDirectory.mkdirs();
+//                    }
+//
+//                    //Creating the temporary storage file
+//                    File targetImagePath = File.createTempFile(timeStamp + "_", ".jpg", storageDirectory);
+//
+//                    OutputStream outputStream = new FileOutputStream(targetImagePath);
+//
+//                    outputStream.write(array);
+//                    outputStream.close();
+//
+//                    //Rescanning the icon_library/gallery so it catches up with our own changes
+//                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//                    mediaScanIntent.setData(Uri.fromFile(targetImagePath));
+//                    sendBroadcast(mediaScanIntent);
+//
+//                    Toast.makeText(MainActivity.this, String.format(Locale.ENGLISH, "Saved to: %s", targetImagePath.getAbsolutePath()), Toast.LENGTH_LONG).show();
+//                } catch (Exception e) {
+//                    Logger.e("Cannot save exporting file to disk (" + e.toString() + ").");
+//                }
+//            }
+//        });
     }
 
     private void showQRScan() {
@@ -214,16 +215,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateQrStates(String statesString) {
         // reset to default
-        renderView.resetAll();
-        renderView.updateShaderWithStatesJson(statesString);
+        renderView.updateStatesWithJson(statesString);
     }
 
     private void reset() {
-        renderView.resetAll();
-    }
-
-    private void initRenderView() {
-        renderView.setRenderBackgroundColor(Color.WHITE);
+        localStateMap.clear();
+        renderView.updateStates(localStateMap);
     }
 
     private void showList() {
@@ -294,10 +291,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         float adjustmentValue = (float) progress / 100f * 2f - 1f;
-                        renderView.updateShader(label.toString(), adjustmentValue);
-                        renderView.requestRender();
+                        localStateMap.put(label.toString(), adjustmentValue);
 
-                        localStateMap.put(label.toString(), progress);
+
+                        renderView.updateStates(localStateMap);
+                        renderView.requestRender();
                     }
 
                     @Override
@@ -311,8 +309,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 if (localStateMap.containsKey(label.toString())) {
-
-                    seekbar.setProgress(localStateMap.get(label.toString()));
+                    float adjustmentValue = (float) localStateMap.get(label.toString());
+                    seekbar.setProgress((int) ((adjustmentValue + 1) / 2 * 100));
                 } else {
                     seekbar.setProgress(50);
                 }
