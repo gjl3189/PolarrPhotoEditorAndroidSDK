@@ -1,18 +1,14 @@
 package co.polarr.polarrrenderdemo;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
@@ -168,19 +164,6 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private void exportImage() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_WRITE_EXTERNAL_STORAGE);
-
-            return;
-        }
-    }
-
     private void showQRScan() {
         Intent intent = new Intent(this, QRScannerActivity.class);
         startActivityForResult(intent, ACTIVITY_RESULT_QR_SCANNER);
@@ -324,9 +307,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2:
                         reset();
-                        break;
-                    case 3:
-                        exportImage();
                         break;
                     case 4:
                         showQRScan();
