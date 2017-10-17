@@ -96,6 +96,11 @@ polarrRender.updateStates(stateMap);
 ```java
 int out = polarrRender.getOutputId();
 ```
+## 释放资源
+```java
+// call in GL thread
+polarrRender.release();
+```
 ## 基本全局调整属性
 "exposure" [曝光](http://polaxiong.com/wiki/hou-qi-shu-yu/pu-guang.html)<br>
 "gamma" [亮度](http://polaxiong.com/wiki/hou-qi-shu-yu/liang-du.html)<br>

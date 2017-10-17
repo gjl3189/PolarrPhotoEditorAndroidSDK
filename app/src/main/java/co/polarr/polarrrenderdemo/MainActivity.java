@@ -84,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
         labelTv = (TextView) findViewById(R.id.label_tv);
         seekbar = (AppCompatSeekBar) findViewById(R.id.seekbar);
+    }
 
+    @Override
+    protected void onDestroy() {
+        renderView.releaseRender();
+        super.onDestroy();
     }
 
     private void importImageDemo() {
@@ -189,6 +194,10 @@ public class MainActivity extends AppCompatActivity {
     private void reset() {
         localStateMap.clear();
         renderView.updateStates(localStateMap);
+    }
+
+    private void releaseRender() {
+        renderView.releaseRender();
     }
 
     private void showList() {

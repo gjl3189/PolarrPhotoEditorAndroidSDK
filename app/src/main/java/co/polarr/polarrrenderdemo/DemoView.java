@@ -83,4 +83,13 @@ public class DemoView extends GLSurfaceView {
             }
         });
     }
+
+    public void releaseRender() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.release();
+            }
+        });
+    }
 }

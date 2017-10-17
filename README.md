@@ -96,6 +96,11 @@ polarrRender.updateStates(stateMap);
 ```java
 int out = polarrRender.getOutputId();
 ```
+## Release all resource
+```java
+// call in GL thread
+polarrRender.release();
+```
 ## Basic global adjustments
 ```
 "exposure",
