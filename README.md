@@ -7,7 +7,7 @@ This SDK includes a starter project (co.polarr.polarrrenderdemo) that calls the 
 The minimum Android API Level is 14 (4.0.3).
 
 ## License
-The SDK included in this repository must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The current version of the SDK expires on September 30, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
+The SDK included in this repository must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The current version of the SDK expires on December 31, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
 
 ## Functionalities
 The current SDK includes everything as seen in Polarr Photo Editor's global adjustment panel
@@ -26,12 +26,6 @@ Below are code samples and function calls to use the SDK
 ```groovy
 // render sdk
 compile (name: 'renderer-release', ext: 'aar')
-  
-// render utils
-compile (name: 'utils-release', ext: 'aar')
-    
-// fast json decoder used by render sdk
-compile 'com.alibaba:fastjson:1.1.55.android'
 ```
 ### Optional
 ```groovy
@@ -41,49 +35,66 @@ compile (name: 'qrcode-release', ext: 'aar')
 // qr code
 compile 'com.google.zxing:core:3.2.1'
 ```
-## Init GLRenderView
-```xml
-<co.polarr.renderer.render.GLRenderView
-  android:id="@+id/render_view"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"/>
-```
+## Init PolarrRender in GL thread
 ```java
-GLRenderView renderView = (GLRenderView) findViewById(R.id.render_view);
+PolarrRender polarrRender = new PolarrRender();
+@Override
+public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    // call in gl thread
+    polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+}
 ```
-## Import image
+## Bind input texture
 ```java
-renderView.importImage(BitmapFactory.decodeResource(getResources(), R.mipmap.demo));
+int inputTexture = polarrRender.getTextureId();
+GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+  
+// render input to input texture.
+GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+```
+## Update render size, need rebind input texture.
+```java
+// call in gl thread
+polarrRender.updateSize(width, height);
 ```
 ## Global adjustments
 Adjust a specific adjustment with value. The value `from -1.0f to +1.0f`.
 More adjustment lables, see [Basic global adjustments](#basic-global-adjustments)
+### Update by a state map
 ```java
 String label = "contrast";
 float adjustmentValue = 0.5f;
-renderView.updateShader(label, adjustmentValue);
-renderView.requestRender();
+Map<String,Object> stateMap = new HashMap<>();
+stateMap.put(label, adjustmentValue);
+
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## Show original image
+### Update from a state json
 ```java
-boolean isOriginal = true;
-renderView.showOriginal(isOriginal);
+String stateJson = "{\"contrast\" : 0.5}";
+
+// call in gl thread
+polarrRender.updateStates(stateJson);
 ```
-## Reset image
+## Draw frame
+```java
+@Override
+public void onDrawFrame(GL10 gl) {
+    // call in GL thread
+    polarrRender.drawFrame();
+}
+```
+## Reset all state
 Reset image to original.
 ```java
-renderView.resetAll();
+stateMap.clear();
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## Export image
+## Get output texture
 ```java
-// save byte array to a file with PNG format. If need a bitmap, set needImage to true.
-boolean needImage = true;
-renderView.exportImageData(needImage, new OnExportCallback() {
-    @Override
-    public void onExport(Bitmap bitmap, byte[] array) {
-        // save array to a file
-    }
-});
+int out = polarrRender.getOutputId();
 ```
 ## Basic global adjustments
 ```
@@ -139,26 +150,7 @@ renderView.exportImageData(needImage, new OnExportCallback() {
 "grain_amount",
 "grain_size",
 ```
-## Render view movements
-Change position
-```java
-float offsetX = 10.0f;
-float offsetY = 5.5f;
-renderView.setPosition(offsetX, offsetY);
-```
-Get current zoom
-```java
-float mZoom = renderView.getZoom();
-```
-Get minimum zoom. If current zoom less than minimum zoom, the image will be too small to fit the view size.
-```java
-float minZoom = renderView.getMinZoom();
-```
-Set zoom
-```java
-float mZoom = 1.2f;
-renderView.setZoom(mZoom);
-```
+
 
 ## QR code
 ### QR code request from a url

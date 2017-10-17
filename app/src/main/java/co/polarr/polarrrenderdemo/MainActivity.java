@@ -174,38 +174,6 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
-
-//        renderView.exportImageData(false, new OnExportCallback() {
-//            @Override
-//            public void onExport(Bitmap bitmap, byte[] array) {
-//                try {
-//                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//                    File storageDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PolarrDemo");
-//
-//                    //Creating the storage directory if it doesn't exist
-//                    if (!storageDirectory.exists()) {
-//                        storageDirectory.mkdirs();
-//                    }
-//
-//                    //Creating the temporary storage file
-//                    File targetImagePath = File.createTempFile(timeStamp + "_", ".jpg", storageDirectory);
-//
-//                    OutputStream outputStream = new FileOutputStream(targetImagePath);
-//
-//                    outputStream.write(array);
-//                    outputStream.close();
-//
-//                    //Rescanning the icon_library/gallery so it catches up with our own changes
-//                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//                    mediaScanIntent.setData(Uri.fromFile(targetImagePath));
-//                    sendBroadcast(mediaScanIntent);
-//
-//                    Toast.makeText(MainActivity.this, String.format(Locale.ENGLISH, "Saved to: %s", targetImagePath.getAbsolutePath()), Toast.LENGTH_LONG).show();
-//                } catch (Exception e) {
-//                    Logger.e("Cannot save exporting file to disk (" + e.toString() + ").");
-//                }
-//            }
-//        });
     }
 
     private void showQRScan() {
@@ -292,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         float adjustmentValue = (float) progress / 100f * 2f - 1f;
                         localStateMap.put(label.toString(), adjustmentValue);
-
 
                         renderView.updateStates(localStateMap);
                         renderView.requestRender();

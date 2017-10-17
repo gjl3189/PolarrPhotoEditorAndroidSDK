@@ -7,7 +7,7 @@
 最低版本限制 Android API Level 14 (4.0.3)
 
 ## 版权限制
-包含本SDK在内的所有版本库中的内容，属于Polarr, Inc.版权所有。未经允许均不得用于商业目的。当前版本的示例SDK失效时间为2017年9月30日。如需要获取完整授权等更多相关信息，请联系我们[info@polarr.co](mailto:info@polarr.co)
+包含本SDK在内的所有版本库中的内容，属于Polarr, Inc.版权所有。未经允许均不得用于商业目的。当前版本的示例SDK失效时间为2017年12月31日。如需要获取完整授权等更多相关信息，请联系我们[info@polarr.co](mailto:info@polarr.co)
 
 ## 功能模块
 本SDK包含了泼辣修图App里面的全局调整功能。以下是泼辣修图的全局调整面板：
@@ -26,12 +26,6 @@
 ```groovy
 // render sdk
 compile (name: 'renderer-release', ext: 'aar')
-  
-// render utils
-compile (name: 'utils-release', ext: 'aar')
-    
-// fast json decoder used by render sdk
-compile 'com.alibaba:fastjson:1.1.55.android'
 ```
 ### 可选的（仅仅用于二维码识别）
 ```groovy
@@ -41,49 +35,66 @@ compile (name: 'qrcode-release', ext: 'aar')
 // qr code
 compile 'com.google.zxing:core:3.2.1'
 ```
-## 初始化 GLRenderView
-```xml
-<co.polarr.renderer.render.GLRenderView
-  android:id="@+id/render_view"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"/>
-```
+## 在GL线程中初始化 PolarrRender
 ```java
-GLRenderView renderView = (GLRenderView) findViewById(R.id.render_view);
+PolarrRender polarrRender = new PolarrRender();
+@Override
+public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    // call in gl thread
+    polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+}
 ```
-## 导入图片
+## 绑定输入Texture 和 绑定输入Bitmap
 ```java
-renderView.importImage(BitmapFactory.decodeResource(getResources(), R.mipmap.demo));
+int inputTexture = polarrRender.getTextureId();
+GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+  
+// render input bitmap to input texture.
+GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+```
+## 更新渲染尺寸。更新后需要更新输入Texture
+```java
+// call in gl thread
+polarrRender.updateSize(width, height);
 ```
 ## 全局调整
 调整单个属性的数值，取值范围从 -1.0f 到 +1.0f.
 更多属性描述, 请参考 [基本全局调整属性](#基本全局调整属性)
+### 更新调整参数，通过Map对象
 ```java
 String label = "contrast";
 float adjustmentValue = 0.5f;
-renderView.updateShader(label, adjustmentValue);
-renderView.requestRender();
+Map<String,Object> stateMap = new HashMap<>();
+stateMap.put(label, adjustmentValue);
+
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## 显示原始图片
+### 更新调整参数，通过json
 ```java
-boolean isOriginal = true;
-renderView.showOriginal(isOriginal);
+String stateJson = "{\"contrast\" : 0.5}";
+
+// call in gl thread
+polarrRender.updateStates(stateJson);
+```
+## 渲染
+```java
+@Override
+public void onDrawFrame(GL10 gl) {
+    // call in GL thread
+    polarrRender.drawFrame();
+}
 ```
 ## 重置图片
 重置图片为原始状态
 ```java
-renderView.resetAll();
+stateMap.clear();
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## 导出图片
+## 获取输入的Texture
 ```java
-// save byte array to a file with PNG format. If need a bitmap, set needImage to true.
-boolean needImage = true;
-renderView.exportImageData(needImage, new OnExportCallback() {
-    @Override
-    public void onExport(Bitmap bitmap, byte[] array) {
-        // save array to a file
-    }
-});
+int out = polarrRender.getOutputId();
 ```
 ## 基本全局调整属性
 "exposure" [曝光](http://polaxiong.com/wiki/hou-qi-shu-yu/pu-guang.html)<br>
@@ -142,26 +153,6 @@ renderView.exportImageData(needImage, new OnExportCallback() {
 "grain_amount" [噪点程度](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-cheng-du.html)<br>
 "grain_size" [噪点大小](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-da-xiao.html)
 
-## 视图调整
-移动位置
-```java
-float offsetX = 10.0f;
-float offsetY = 5.5f;
-renderView.setPosition(offsetX, offsetY);
-```
-获取视图缩放
-```java
-float mZoom = renderView.getZoom();
-```
-获取最佳适配屏幕缩放数值
-```java
-float minZoom = renderView.getMinZoom();
-```
-设置视图缩放
-```java
-float mZoom = 1.2f;
-renderView.setZoom(mZoom);
-```
 
 ## 滤镜二维码
 ### 通过url请求滤镜信息
