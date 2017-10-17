@@ -111,12 +111,12 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 Uri uri = data.getData();
                 final Bitmap imageBm = decodeBitmapFromUri(this, uri);
-                renderView.post(new Runnable() {
+                renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         renderView.importImage(imageBm);
                     }
-                });
+                }, 1000);
             }
         } else if (REQUEST_IMPORT_QR_PHOTO == requestCode && resultCode == RESULT_OK) {
             if (data != null) {

@@ -51,6 +51,9 @@ GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
   
 // render input bitmap to input texture.
 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+
+// 输入Texture变化后需要调用
+polarrRender.updateInputTexture();
 ```
 ## 更新渲染尺寸。更新后需要更新输入Texture
 ```java

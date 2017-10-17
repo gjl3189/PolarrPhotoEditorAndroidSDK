@@ -51,6 +51,9 @@ GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
   
 // render input to input texture.
 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+
+// call after input texture changed
+polarrRender.updateInputTexture();
 ```
 ## Update render size, need rebind input texture.
 ```java
