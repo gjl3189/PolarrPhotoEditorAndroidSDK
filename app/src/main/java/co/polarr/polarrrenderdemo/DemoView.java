@@ -40,7 +40,6 @@ public class DemoView extends GLSurfaceView {
             genInputTexture();
             polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
             polarrRender.setInputTexture(inputTexture);
-            polarrRender.createInputTexture();
         }
 
         @Override
