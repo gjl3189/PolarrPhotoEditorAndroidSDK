@@ -114,60 +114,65 @@ int out = polarrRender.getOutputId();
 polarrRender.release();
 ```
 ## Basic global adjustments
-```
-"exposure",
-"contrast",
-"saturation",
-"vibrance",
-"distortion_horizontal",
-"distortion_vertical",
-"fringing",
-"color_denoise",
-"luminance_denoise",
-"dehaze",
-"diffuse",
-"temperature",
-"tint",
-"gamma",
-"highlights",
-"shadows",
-"whites",
-"blacks",
-"clarity",
-"highlights_hue",
-"highlights_saturation",
-"shadows_hue",
-"shadows_saturation",
-"balance",
-"sharpen",
-"hue_red",
-"hue_orange",
-"hue_yellow",
-"hue_green",
-"hue_aqua",
-"hue_blue",
-"hue_purple",
-"hue_magenta",
-"saturation_red",
-"saturation_orange",
-"saturation_yellow",
-"saturation_green",
-"saturation_aqua",
-"saturation_blue",
-"saturation_purple",
-"saturation_magenta",
-"luminance_red",
-"luminance_orange",
-"luminance_yellow",
-"luminance_green",
-"luminance_aqua",
-"luminance_blue",
-"luminance_purple",
-"luminance_magenta",
-"grain_amount",
-"grain_size",
-```
 
+| Properties | Range |
+|-----|:-------:|
+| exposure | -1, +1 |
+| gamma | -1, +1 |
+| contrast | -1, +1 |
+| saturation | -1, +1 |
+| vibrance | -1, +1 |
+| distortion_horizontal | -1, +1 |
+| distortion_vertical | -1, +1 |
+| distortion_amount | -1, +1 |
+| fringing | -1, +1 |
+| color_denoise | 0, +1 |
+| luminance_denoise | 0, +1 |
+| dehaze | -1, +1 |
+| diffuse | 0, +1 |
+| temperature | -1, +1 |
+| tint | -1, +1 |
+| highlights | -1, +1 |
+| shadows | -1, +1 |
+| whites | -1, +1 |
+| blacks | -1, +1 |
+| clarity | -1, +1 |
+| sharpen | 0, +1 |
+| highlights_hue | 0, +1 |
+| highlights_saturation | 0, +1 |
+| shadows_hue | 0, +1 |
+| shadows_saturation | 0, +1 |
+| balance | -1, +1 |\
+|  |  |
+| hue_red | -1, +1 |
+| hue_orange | -1, +1 |
+| hue_yellow | -1, +1 |
+| hue_green | -1, +1 |
+| hue_aqua | -1, +1 |
+| hue_blue | -1, +1 |
+| hue_purple | -1, +1 |
+| hue_magenta | -1, +1 |
+|  |  |
+| saturation_red | -1, +1 |
+| saturation_orange | -1, +1 |
+| saturation_yellow | -1, +1 |
+| saturation_green | -1, +1 |
+| saturation_aqua | -1, +1 |
+| saturation_blue | -1, +1 |
+| saturation_purple | -1, +1 |
+| saturation_magenta | -1, +1 |
+|  |  |
+| luminance_red | -1, +1 |
+| luminance_orange | -1, +1 |
+| luminance_yellow | -1, +1 |
+| luminance_green | -1, +1 |
+| luminance_aqua | -1, +1 |
+| luminance_blue | -1, +1 |
+| luminance_purple | -1, +1 |
+| luminance_magenta | -1, +1 |
+|  |  |
+| grain_amount | 0, +1 |
+| grain_size | 0, +1 |
 
 ## QR code
 ### QR code request from a url

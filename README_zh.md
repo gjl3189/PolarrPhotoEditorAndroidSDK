@@ -114,62 +114,65 @@ int out = polarrRender.getOutputId();
 polarrRender.release();
 ```
 ## 基本全局调整属性
-"exposure" [曝光](http://polaxiong.com/wiki/hou-qi-shu-yu/pu-guang.html)<br>
-"gamma" [亮度](http://polaxiong.com/wiki/hou-qi-shu-yu/liang-du.html)<br>
-"contrast" [对比度](http://polaxiong.com/wiki/hou-qi-shu-yu/dui-bi-du.html)<br>
-"saturation" [饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/bao-he-du.html)<br>
-"vibrance" [自然饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/zi-ran-bao-he-du.html)<br>
-"distortion_horizontal" [水平透视](http://polaxiong.com/wiki/hou-qi-shu-yu/shui-ping-tou-shi.html)<br>
-"distortion_vertical" [垂直透视](http://polaxiong.com/wiki/hou-qi-shu-yu/chui-zhi-tou-shi.html)<br>
-"fringing" [色差](http://polaxiong.com/wiki/hou-qi-shu-yu/se-cha.html)<br>
-"color_denoise" [降噪色彩](http://polaxiong.com/wiki/hou-qi-shu-yu/jiang-zao-se-cai.html)<br>
-"luminance_denoise" [降噪明度](http://polaxiong.com/wiki/hou-qi-shu-yu/jiang-zao-ming-du.html)<br>
-"dehaze" [去雾](http://polaxiong.com/wiki/hou-qi-shu-yu/qu-wu.html)<br>
-"diffuse" [眩光](http://polaxiong.com/wiki/hou-qi-shu-yu/xuan-guang.html)<br>
-"temperature" [色温](http://polaxiong.com/wiki/hou-qi-shu-yu/se-wen.html)<br>
-"tint" [色调](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao.html)<br>
-"highlights" [高光](http://polaxiong.com/wiki/hou-qi-shu-yu/gao-guang.html)<br>
-"shadows" [阴影](http://polaxiong.com/wiki/hou-qi-shu-yu/yin-ying.html)<br>
-"whites" [白色色阶](http://polaxiong.com/wiki/hou-qi-shu-yu/bai-se-se-jie.html)<br>
-"blacks" [黑色色阶](http://polaxiong.com/wiki/hou-qi-shu-yu/hei-se-se-jie.html)<br>
-"clarity" [清晰度](http://polaxiong.com/wiki/hou-qi-shu-yu/qing-xi-du.html)<br>
-"highlights_hue" [色调高光色相](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-gao-guang.html)<br>
-"highlights_saturation" [色调高光饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-gao-guang.html)<br>
-"shadows_hue" [色调阴影色相](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-yin-ying.html)<br>
-"shadows_saturation" [色调阴影饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-yin-ying.html)<br>
-"balance" [色调平衡](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-ping-heng.html)<br>
-"sharpen" [锐化](http://polaxiong.com/wiki/hou-qi-shu-yu/rui-hua.html)
 
-"hue_red" [HSL色相红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_orange" [HSL色相橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_yellow" [HSL色相黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_green" [HSL色相绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_aqua" [HSL色相青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_blue" [HSL色相蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_purple" [HSL色相紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"hue_magenta" [HSL色相品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)
-
-"saturation_red" [HSL饱和度红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_orange" [HSL饱和度橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_yellow" [HSL饱和度黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_green" [HSL饱和度绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_aqua" [HSL饱和度青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_blue" [HSL饱和度蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_purple" [HSL饱和度紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"saturation_magenta" [HSL饱和度品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-
-"luminance_red" [HSL明度红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_orange" [HSL明度橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_yellow" [HSL明度黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_green" [HSL明度绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_aqua" [HSL明度青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_blue" [HSL明度蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_purple" [HSL明度紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-"luminance_magenta" [HSL明度品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)<br>
-
-"grain_amount" [噪点程度](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-cheng-du.html)<br>
-"grain_size" [噪点大小](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-da-xiao.html)
-
+| 属性 | 取值范围 | 描述 |
+|-----|:-------:|-----:|
+| exposure | -1, +1 | [曝光](http://polaxiong.com/wiki/hou-qi-shu-yu/pu-guang.html) |
+| gamma | -1, +1 | [亮度](http://polaxiong.com/wiki/hou-qi-shu-yu/liang-du.html) |
+| contrast | -1, +1 | [对比度](http://polaxiong.com/wiki/hou-qi-shu-yu/dui-bi-du.html)|
+| saturation | -1, +1 | [饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/bao-he-du.html)|
+| vibrance | -1, +1 | [自然饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/zi-ran-bao-he-du.html)|
+| distortion_horizontal | -1, +1 | [水平透视](http://polaxiong.com/wiki/hou-qi-shu-yu/shui-ping-tou-shi.html)|
+| distortion_vertical | -1, +1 | [垂直透视](http://polaxiong.com/wiki/hou-qi-shu-yu/chui-zhi-tou-shi.html)|
+| distortion_amount | -1, +1 | [镜头扭曲](http://polaxiong.com/wiki/hou-qi-shu-yu/jing-tou-niu-qu.html)|
+| fringing | -1, +1 | [色差](http://polaxiong.com/wiki/hou-qi-shu-yu/se-cha.html)|
+| color_denoise | 0, +1 | [降噪色彩](http://polaxiong.com/wiki/hou-qi-shu-yu/jiang-zao-se-cai.html)|
+| luminance_denoise | 0, +1 | [降噪明度](http://polaxiong.com/wiki/hou-qi-shu-yu/jiang-zao-ming-du.html)|
+| dehaze | -1, +1 | [去雾](http://polaxiong.com/wiki/hou-qi-shu-yu/qu-wu.html)|
+| diffuse | 0, +1 | [眩光](http://polaxiong.com/wiki/hou-qi-shu-yu/xuan-guang.html)|
+| temperature | -1, +1 | [色温](http://polaxiong.com/wiki/hou-qi-shu-yu/se-wen.html)|
+| tint | -1, +1 | [色调](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao.html)|
+| highlights | -1, +1 | [高光](http://polaxiong.com/wiki/hou-qi-shu-yu/gao-guang.html)|
+| shadows | -1, +1 | [阴影](http://polaxiong.com/wiki/hou-qi-shu-yu/yin-ying.html)|
+| whites | -1, +1 | [白色色阶](http://polaxiong.com/wiki/hou-qi-shu-yu/bai-se-se-jie.html)|
+| blacks | -1, +1 | [黑色色阶](http://polaxiong.com/wiki/hou-qi-shu-yu/hei-se-se-jie.html)|
+| clarity | -1, +1 | [清晰度](http://polaxiong.com/wiki/hou-qi-shu-yu/qing-xi-du.html)|
+| sharpen | 0, +1 | [锐化](http://polaxiong.com/wiki/hou-qi-shu-yu/rui-hua.html)
+| highlights_hue | 0, +1 | [色调高光色相](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-gao-guang.html)|
+| highlights_saturation | 0, +1 | [色调高光饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-gao-guang.html)|
+| shadows_hue | 0, +1 | [色调阴影色相](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-yin-ying.html)|
+| shadows_saturation | 0, +1 | [色调阴影饱和度](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-yin-ying.html)|
+| balance | -1, +1 | [色调平衡](http://polaxiong.com/wiki/hou-qi-shu-yu/se-tiao-ping-heng.html)|
+|  |  |  |
+| hue_red | -1, +1 | [HSL色相红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_orange | -1, +1 | [HSL色相橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_yellow | -1, +1 | [HSL色相黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_green | -1, +1 | [HSL色相绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_aqua | -1, +1 | [HSL色相青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_blue | -1, +1 | [HSL色相蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_purple | -1, +1 | [HSL色相紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| hue_magenta | -1, +1 | [HSL色相品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)
+|  |  |  |
+| saturation_red | -1, +1 | [HSL饱和度红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_orange | -1, +1 | [HSL饱和度橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_yellow | -1, +1 | [HSL饱和度黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_green | -1, +1 | [HSL饱和度绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_aqua | -1, +1 | [HSL饱和度青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_blue | -1, +1 | [HSL饱和度蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_purple | -1, +1 | [HSL饱和度紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| saturation_magenta | -1, +1 | [HSL饱和度品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+|  |  |  |
+| luminance_red | -1, +1 | [HSL明度红色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_orange | -1, +1 | [HSL明度橘色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_yellow | -1, +1 | [HSL明度黄色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_green | -1, +1 | [HSL明度绿色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_aqua | -1, +1 | [HSL明度青色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_blue | -1, +1 | [HSL明度蓝色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_purple | -1, +1 | [HSL明度紫色](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+| luminance_magenta | -1, +1 | [HSL明度品红](http://polaxiong.com/wiki/hou-qi-shu-yu/hsl.html)|
+|  |  |  |
+| grain_amount | 0, +1 | [噪点程度](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-cheng-du.html)|
+| grain_size | 0, +1 | [噪点大小](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-da-xiao.html)|
 
 ## 滤镜二维码
 ### 通过url请求滤镜信息
