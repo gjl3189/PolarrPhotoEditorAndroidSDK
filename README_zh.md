@@ -44,13 +44,22 @@ public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
 }
 ```
-## 绑定输入Texture 和 绑定输入Bitmap
+## 创建或传入Texture
+### 创建Texture
 ```java
+// 只需要调用一次
+polarrRender.createInputTexture();
+// bind a bitmap to sdk
 int inputTexture = polarrRender.getTextureId();
 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
-  
-// render input bitmap to input texture.
 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+
+// 输入Texture变化后需要调用
+polarrRender.updateInputTexture();
+```
+### 传入一个Texture
+```java
+polarrRender.setInputTexture(inputTexture);
 
 // 输入Texture变化后需要调用
 polarrRender.updateInputTexture();

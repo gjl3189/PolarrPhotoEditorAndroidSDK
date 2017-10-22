@@ -22,6 +22,7 @@ import co.polarr.renderer.filters.Basic;
 public class DemoView extends GLSurfaceView {
     private PolarrRender polarrRender;
     private DemoRender render = new DemoRender();
+    private int inputTexture;
 
     public DemoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,7 +37,10 @@ public class DemoView extends GLSurfaceView {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+            genInputTexture();
             polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+            polarrRender.setInputTexture(inputTexture);
+            polarrRender.createInputTexture();
         }
 
         @Override
@@ -59,13 +63,25 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                int inputTexture = polarrRender.getTextureId();
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
 
                 polarrRender.updateInputTexture();
             }
         });
+    }
+
+    private void genInputTexture() {
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+
+        inputTexture = textures[0];
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
     }
 
     public void updateStatesWithJson(final String statesString) {

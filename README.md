@@ -44,13 +44,22 @@ public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
 }
 ```
-## Bind input texture
+## Create or Set an input texture
+### Create a texture and bind
 ```java
+// only need call one time.
+polarrRender.createInputTexture();
+// bind a bitmap to sdk
 int inputTexture = polarrRender.getTextureId();
 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
-  
-// render input to input texture.
 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+
+// call after input texture changed
+polarrRender.updateInputTexture();
+```
+### Set an input texture and bind
+```java
+polarrRender.setInputTexture(inputTexture);
 
 // call after input texture changed
 polarrRender.updateInputTexture();
