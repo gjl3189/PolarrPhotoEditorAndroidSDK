@@ -14,6 +14,11 @@
 
 ![sdk](https://user-images.githubusercontent.com/5923363/28428260-6f90ca4c-6dab-11e7-8136-67498e369665.png)
 
+## 效果展示
+
+泼辣修图SDK的参数调整效果超过主流大量英勇地调整效果，具体对比请见
+https://www.dropbox.com/sh/5idxxl9g8hq7171/AAAL3ctgl6o_cnhn8lxxd2Hca?dl=0
+
 示例工程
 
 ![示例工程](https://user-images.githubusercontent.com/5923363/28439929-bcdd097a-6dd6-11e7-8456-beef54bfaac8.gif)
