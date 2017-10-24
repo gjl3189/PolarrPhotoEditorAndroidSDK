@@ -7,8 +7,8 @@ android {
         applicationId "co.polarr.polarrrenderdemo"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -36,11 +36,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile (name: 'renderer-release', ext: 'aar')
-    compile (name: 'utils-release', ext: 'aar')
     compile (name: 'qrcode-release', ext: 'aar')
 
-    // fast json decoder
-    compile 'com.alibaba:fastjson:1.1.55.android'
     // qr code
     compile 'com.google.zxing:core:3.2.1'
 }

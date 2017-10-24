@@ -7,15 +7,14 @@ This SDK includes a starter project (co.polarr.polarrrenderdemo) that calls the 
 The minimum Android API Level is 14 (4.0.3).
 
 ## License
-The SDK included in this repository must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The current version of the SDK expires on September 30, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
+The SDK included in this repository must not be used for any commercial purposes without the direct written consent of Polarr, Inc. The current version of the SDK expires on December 31, 2017. For pricing and more info regarding the full license SDK, please email [info@polarr.co](mailto:info@polarr.co).
 
 ## Functionalities
 The current SDK includes everything as seen in Polarr Photo Editor's global adjustment panel
 
 ![sdk](https://user-images.githubusercontent.com/806199/27817613-efbf57be-6046-11e7-915c-7d8a48c4a716.jpg)
 
-Starter project
-
+Starter project<br>
 ![Starter project](https://user-images.githubusercontent.com/5923363/28439929-bcdd097a-6dd6-11e7-8456-beef54bfaac8.gif)
 
 # Sample Usage
@@ -27,12 +26,6 @@ Below are code samples and function calls to use the SDK
 ```groovy
 // render sdk
 compile (name: 'renderer-release', ext: 'aar')
-  
-// render utils
-compile (name: 'utils-release', ext: 'aar')
-    
-// fast json decoder used by render sdk
-compile 'com.alibaba:fastjson:1.1.55.android'
 ```
 ### Optional
 ```groovy
@@ -42,124 +35,144 @@ compile (name: 'qrcode-release', ext: 'aar')
 // qr code
 compile 'com.google.zxing:core:3.2.1'
 ```
-## Init GLRenderView
-```xml
-<co.polarr.renderer.render.GLRenderView
-  android:id="@+id/render_view"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"/>
-```
+## Init PolarrRender in GL thread
 ```java
-GLRenderView renderView = (GLRenderView) findViewById(R.id.render_view);
+PolarrRender polarrRender = new PolarrRender();
+@Override
+public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    // call in gl thread
+    polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+}
 ```
-## Import image
+## Create or Set an input texture
+### Create a texture and bind
 ```java
-renderView.importImage(BitmapFactory.decodeResource(getResources(), R.mipmap.demo));
+// only need call one time.
+polarrRender.createInputTexture();
+// bind a bitmap to sdk
+int inputTexture = polarrRender.getTextureId();
+GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+
+// call after input texture changed
+polarrRender.updateInputTexture();
+```
+### Set an input texture and bind
+```java
+polarrRender.setInputTexture(inputTexture);
+
+// call after input texture changed
+polarrRender.updateInputTexture();
+```
+## Update render size, need rebind input texture.
+```java
+// call in gl thread
+polarrRender.updateSize(width, height);
 ```
 ## Global adjustments
 Adjust a specific adjustment with value. The value `from -1.0f to +1.0f`.
 More adjustment lables, see [Basic global adjustments](#basic-global-adjustments)
+### Update by a state map
 ```java
 String label = "contrast";
 float adjustmentValue = 0.5f;
-renderView.updateShader(label, adjustmentValue);
-renderView.requestRender();
+Map<String,Object> stateMap = new HashMap<>();
+stateMap.put(label, adjustmentValue);
+
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## Show original image
+### Update from a state json
 ```java
-boolean isOriginal = true;
-renderView.showOriginal(isOriginal);
+String stateJson = "{\"contrast\" : 0.5}";
+
+// call in gl thread
+polarrRender.updateStates(stateJson);
 ```
-## Reset image
+## Draw frame
+```java
+@Override
+public void onDrawFrame(GL10 gl) {
+    // call in GL thread
+    polarrRender.drawFrame();
+}
+```
+## Reset all state
 Reset image to original.
 ```java
-renderView.resetAll();
+stateMap.clear();
+// call in gl thread
+polarrRender.updateStates(stateMap);
 ```
-## Export image
+## Get output texture
 ```java
-// save byte array to a file with PNG format. If need a bitmap, set needImage to true.
-boolean needImage = true;
-renderView.exportImageData(needImage, new OnExportCallback() {
-    @Override
-    public void onExport(Bitmap bitmap, byte[] array) {
-        // save array to a file
-    }
-});
+int out = polarrRender.getOutputId();
+```
+## Release all resource
+```java
+// call in GL thread
+polarrRender.release();
 ```
 ## Basic global adjustments
-```
-"exposure",
-"contrast",
-"saturation",
-"vibrance",
-"distortion_horizontal",
-"distortion_vertical",
-"fringing",
-"color_denoise",
-"luminance_denoise",
-"dehaze",
-"diffuse",
-"temperature",
-"tint",
-"gamma",
-"highlights",
-"shadows",
-"whites",
-"blacks",
-"clarity",
-"highlights_hue",
-"highlights_saturation",
-"shadows_hue",
-"shadows_saturation",
-"balance",
-"sharpen",
-"hue_red",
-"hue_orange",
-"hue_yellow",
-"hue_green",
-"hue_aqua",
-"hue_blue",
-"hue_purple",
-"hue_magenta",
-"saturation_red",
-"saturation_orange",
-"saturation_yellow",
-"saturation_green",
-"saturation_aqua",
-"saturation_blue",
-"saturation_purple",
-"saturation_magenta",
-"luminance_red",
-"luminance_orange",
-"luminance_yellow",
-"luminance_green",
-"luminance_aqua",
-"luminance_blue",
-"luminance_purple",
-"luminance_magenta",
-"grain_amount",
-"grain_size",
-```
-## Render view movements
-Change position
-```java
-float offsetX = 10.0f;
-float offsetY = 5.5f;
-renderView.setPosition(offsetX, offsetY);
-```
-Get current zoom
-```java
-float mZoom = renderView.getZoom();
-```
-Get minimum zoom. If current zoom less than minimum zoom, the image will be too small to fit the view size.
-```java
-float minZoom = renderView.getMinZoom();
-```
-Set zoom
-```java
-float mZoom = 1.2f;
-renderView.setZoom(mZoom);
-```
+
+| Properties | Range |
+|-----|:-------:|
+| exposure | -1, +1 |
+| gamma | -1, +1 |
+| contrast | -1, +1 |
+| saturation | -1, +1 |
+| vibrance | -1, +1 |
+| distortion_horizontal | -1, +1 |
+| distortion_vertical | -1, +1 |
+| distortion_amount | -1, +1 |
+| fringing | -1, +1 |
+| color_denoise | 0, +1 |
+| luminance_denoise | 0, +1 |
+| dehaze | -1, +1 |
+| diffuse | 0, +1 |
+| temperature | -1, +1 |
+| tint | -1, +1 |
+| highlights | -1, +1 |
+| shadows | -1, +1 |
+| whites | -1, +1 |
+| blacks | -1, +1 |
+| clarity | -1, +1 |
+| sharpen | 0, +1 |
+| highlights_hue | 0, +1 |
+| highlights_saturation | 0, +1 |
+| shadows_hue | 0, +1 |
+| shadows_saturation | 0, +1 |
+| balance | -1, +1 |\
+|  |  |
+| hue_red | -1, +1 |
+| hue_orange | -1, +1 |
+| hue_yellow | -1, +1 |
+| hue_green | -1, +1 |
+| hue_aqua | -1, +1 |
+| hue_blue | -1, +1 |
+| hue_purple | -1, +1 |
+| hue_magenta | -1, +1 |
+|  |  |
+| saturation_red | -1, +1 |
+| saturation_orange | -1, +1 |
+| saturation_yellow | -1, +1 |
+| saturation_green | -1, +1 |
+| saturation_aqua | -1, +1 |
+| saturation_blue | -1, +1 |
+| saturation_purple | -1, +1 |
+| saturation_magenta | -1, +1 |
+|  |  |
+| luminance_red | -1, +1 |
+| luminance_orange | -1, +1 |
+| luminance_yellow | -1, +1 |
+| luminance_green | -1, +1 |
+| luminance_aqua | -1, +1 |
+| luminance_blue | -1, +1 |
+| luminance_purple | -1, +1 |
+| luminance_magenta | -1, +1 |
+|  |  |
+| grain_amount | 0, +1 |
+| grain_size | 0, +1 |
 
 ## QR code
 ### QR code request from a url

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="co.polarr.renderdemo.MainActivity">
+    tools:context="co.polarr.polarrrenderdemo.MainActivity">
 
 
     <RelativeLayout
@@ -45,7 +45,7 @@
         </LinearLayout>
 
 
-        <co.polarr.polarrrenderdemo.CustomRenderView
+        <co.polarr.polarrrenderdemo.DemoView
             android:id="@+id/render_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
