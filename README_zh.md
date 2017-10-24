@@ -2,7 +2,7 @@
 
 泼辣修图SDK的体积仅仅为 (<200kb)。 本SDK使用Android原生OpenGL框架开发。目前用于泼辣修图中[泼辣修图](https://play.google.com/store/apps/details?id=photo.editor.polarr). 
 
-本SDK包含了一个示例工程 (co.polarr.polarrrenderdemo) 用于调试以及开发对接。本示例程序演示了SDK中的所有功能
+本SDK包含了一个示例工程 (co.polarr.polarrrenderdemo) 用于调试以及开发对接。本示例程序演示了SDK中的所有功能 
 
 最低版本限制 Android API Level 14 (4.0.3)
 
@@ -16,6 +16,11 @@
 
 示例工程<br>
 ![示例工程](https://user-images.githubusercontent.com/5923363/28439929-bcdd097a-6dd6-11e7-8456-beef54bfaac8.gif)
+
+## 效果展示
+
+泼辣修图SDK的参数调整效果超过主流大量英勇地调整效果，具体对比请见
+https://www.dropbox.com/sh/5idxxl9g8hq7171/AAAL3ctgl6o_cnhn8lxxd2Hca?dl=0
 
 # 易用性
 
