@@ -7,11 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import co.polarr.qrcode.QRUtils;
@@ -45,35 +45,16 @@ public class MainActivity extends AppCompatActivity {
      * save adjustment values
      */
     private Map<String, Object> localStateMap = new HashMap<>();
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    hideAll();
-                    showMenu();
-                    return false;
-                case R.id.navigation_list:
-                    showList();
-                    return false;
-            }
-            return false;
-        }
-
-    };
+    private Map<String, Object> faceStates = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         // init render view
         renderView = (DemoView) findViewById(R.id.render_view);
+        renderView.setAlpha(0);
 
         sliderCon = findViewById(R.id.slider);
         sliderCon.setVisibility(View.GONE);
@@ -83,14 +64,81 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.navigation, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        hideAll();
+        switch (item.getItemId()) {
+            case R.id.navigation_import_image:
+                importImage();
+                break;
+            case R.id.navigation_import_demo:
+                importImageDemo();
+                break;
+            case R.id.navigation_reset:
+                reset();
+                break;
+            case R.id.navigation_qr_scan:
+                showQRScan();
+                break;
+            case R.id.navigation_import_qr:
+                importQrImage();
+                break;
+        }
+
+        return true;
+    }
+
+    public void btnClicked(View view) {
+        switch (view.getId()) {
+            case R.id.tv_desc:
+                importImageDemo();
+                break;
+            case R.id.btn_addjustment:
+                showList();
+                break;
+            case R.id.btn_auto:
+                renderView.autoEnhance(localStateMap);
+                break;
+            case R.id.btn_auto_face:
+                renderView.autoEnhanceFace0(localStateMap);
+                break;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         renderView.releaseRender();
         super.onDestroy();
     }
 
     private void importImageDemo() {
-        Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo);
+        final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1);
+
+        new Thread() {
+            @Override
+            public void run() {
+                float perfectSize = 500f;
+                float minScale = Math.min(perfectSize / imageBm.getWidth(), perfectSize / imageBm.getHeight());
+                minScale = Math.min(minScale, 1f);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBm, (int) (minScale * imageBm.getWidth()), (int) (minScale * imageBm.getHeight()), true);
+                FaceUtil.InitFaceUtil(MainActivity.this);
+                Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
+                scaledBitmap.recycle();
+
+                faceStates = faces;
+                localStateMap.putAll(faceStates);
+
+                renderView.updateStates(localStateMap);
+            }
+        }.start();
+
         renderView.importImage(imageBm);
+        renderView.setAlpha(1);
     }
 
     private void importImage() {
@@ -115,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         renderView.importImage(imageBm);
+                        renderView.setAlpha(1);
                     }
                 }, 1000);
             }
@@ -176,6 +225,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void reset() {
         localStateMap.clear();
+        localStateMap.putAll(faceStates);
+        FaceUtil.ResetFaceStates(faceStates);
+
         renderView.updateStates(localStateMap);
     }
 
@@ -253,6 +305,8 @@ public class MainActivity extends AppCompatActivity {
                         float adjustmentValue = (float) progress / 100f * 2f - 1f;
                         localStateMap.put(label.toString(), adjustmentValue);
 
+                        labelTv.setText(String.format(Locale.ENGLISH, "%s: %.2f", label, adjustmentValue));
+
                         renderView.updateStates(localStateMap);
                         renderView.requestRender();
                     }
@@ -270,51 +324,11 @@ public class MainActivity extends AppCompatActivity {
                 if (localStateMap.containsKey(label.toString())) {
                     float adjustmentValue = (float) localStateMap.get(label.toString());
                     seekbar.setProgress((int) ((adjustmentValue + 1) / 2 * 100));
+                    labelTv.setText(String.format(Locale.ENGLISH, "%s: %.2f", label, adjustmentValue));
                 } else {
                     seekbar.setProgress(50);
                 }
 
-                dialog.dismiss();
-            }
-
-        });
-        adb.setNegativeButton("Cancel", null);
-        adb.setTitle("Choose a type:");
-        adb.show();
-    }
-
-    private void showMenu() {
-        AlertDialog.Builder adb = new AlertDialog.Builder(this);
-        final CharSequence items[] = new CharSequence[]{
-                "Import image",
-                "Import demo",
-                "Reset image",
-                "Export image",
-                "Qr scan",
-                "Import qr code image",
-        };
-
-        adb.setItems(items, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int n) {
-                switch (n) {
-                    case 0:
-                        importImage();
-                        break;
-                    case 1:
-                        importImageDemo();
-                        break;
-                    case 2:
-                        reset();
-                        break;
-                    case 4:
-                        showQRScan();
-                        break;
-                    case 5:
-                        importQrImage();
-                        break;
-                }
                 dialog.dismiss();
             }
 

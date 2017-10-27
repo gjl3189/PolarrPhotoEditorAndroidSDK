@@ -1,28 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="co.polarr.polarrrenderdemo.MainActivity">
 
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="60dp"
+        android:onClick="btnClicked"
+        android:text="@string/demo_desc"
+        android:textSize="20sp" />
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/bottom_con"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/message"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="@string/desc_home" />
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_addjustment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="btnClicked"
+                android:text="Adjustments"
+                android:textSize="8sp" />
+
+            <Button
+                android:id="@+id/btn_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="btnClicked"
+                android:text="Auto Enhance"
+                android:textSize="8sp" />
+
+            <Button
+                android:id="@+id/btn_auto_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="btnClicked"
+                android:text="Enhance Face_0"
+                android:textSize="8sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/slider"
@@ -44,22 +75,12 @@
 
         </LinearLayout>
 
+    </LinearLayout>
 
-        <co.polarr.polarrrenderdemo.DemoView
-            android:id="@+id/render_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/slider"
-            android:layout_below="@id/message" />
-    </RelativeLayout>
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
+    <co.polarr.polarrrenderdemo.DemoView
+        android:id="@+id/render_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:itemIconTint="@drawable/menu_selector"
-        app:itemTextColor="@drawable/menu_selector"
-        app:menu="@menu/navigation" />
-
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_con" />
+</RelativeLayout>

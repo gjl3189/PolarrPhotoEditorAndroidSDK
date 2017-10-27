@@ -2,12 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_menu"
-        android:title="@string/title_menu" />
-
+        android:id="@+id/navigation_import_image"
+        android:title="Import image" />
     <item
-        android:id="@+id/navigation_list"
-        android:icon="@drawable/ic_adjustment"
-        android:title="@string/title_list" />
+        android:id="@+id/navigation_import_demo"
+        android:title="Import demo" />
+    <item
+        android:id="@+id/navigation_reset"
+        android:title="Reset image" />
+    <!--    <item
+            android:id="@+id/navigation_export"
+            android:title="Export image" />-->
+    <item
+        android:id="@+id/navigation_qr_scan"
+        android:title="Qr scan" />
+    <item
+        android:id="@+id/navigation_import_qr"
+        android:title="Import qr code image" />
 </menu>
