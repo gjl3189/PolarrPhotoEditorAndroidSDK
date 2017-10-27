@@ -18,11 +18,16 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import co.polarr.qrcode.QRUtils;
+import co.polarr.renderer.FilterPackageUtil;
+import co.polarr.renderer.entities.FilterItem;
+import co.polarr.renderer.entities.FilterPackage;
 import co.polarr.renderer.utils.QRCodeUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private Map<String, Object> localStateMap = new HashMap<>();
     private Map<String, Object> faceStates = new HashMap<>();
+    private FilterItem mCurrentFilter;
+
+    private List<FilterItem> mFilters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         renderView.setAlpha(0);
 
         sliderCon = findViewById(R.id.slider);
-        sliderCon.setVisibility(View.GONE);
+        sliderCon.setVisibility(View.INVISIBLE);
 
         labelTv = (TextView) findViewById(R.id.label_tv);
         seekbar = (AppCompatSeekBar) findViewById(R.id.seekbar);
@@ -94,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnClicked(View view) {
+        hideAll();
         switch (view.getId()) {
             case R.id.tv_desc:
                 importImageDemo();
@@ -106,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn_auto_face:
                 renderView.autoEnhanceFace0(localStateMap);
+                break;
+            case R.id.btn_filters:
+                showFilters();
                 break;
         }
     }
@@ -236,6 +248,74 @@ public class MainActivity extends AppCompatActivity {
         renderView.releaseRender();
     }
 
+    private void showFilters() {
+        if (mFilters == null) {
+            List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
+            mFilters = new ArrayList<>();
+            for (FilterPackage filterPackage : packages) {
+                mFilters.addAll(filterPackage.filters);
+            }
+        }
+        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        final CharSequence items[] = new CharSequence[mFilters.size()];
+        for (int i = 0; i < mFilters.size(); i++) {
+            items[i] = mFilters.get(i).filterName("cn");
+        }
+        adb.setItems(items, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int n) {
+                sliderCon.setVisibility(View.VISIBLE);
+                FilterItem filterItem = mFilters.get(n);
+
+                localStateMap.clear();
+                localStateMap.putAll(faceStates);
+                localStateMap.putAll(filterItem.state);
+                mCurrentFilter = filterItem;
+
+                renderView.updateStates(filterItem.state);
+
+                final String label = "Filter:" + filterItem.filterName("cn");
+                labelTv.setText(label);
+                seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        float adjustmentValue = (float) progress / 100f;
+//                        localStateMap.put(label.toString(), adjustmentValue);
+
+                        if (mCurrentFilter != null) {
+                            localStateMap.clear();
+                            localStateMap.putAll(faceStates);
+                            Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(mCurrentFilter.state, adjustmentValue);
+                            localStateMap.putAll(interpolateStates);
+
+                            renderView.updateStates(interpolateStates);
+                        }
+
+                        labelTv.setText(String.format(Locale.ENGLISH, "%s: %.2f", label, adjustmentValue));
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+                seekbar.setProgress(100);
+
+                dialog.dismiss();
+            }
+
+        });
+        adb.setNegativeButton("Cancel", null);
+        adb.setTitle("Choose a filter:");
+        adb.show();
+    }
+
     private void showList() {
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         final CharSequence items[] = new CharSequence[]{
@@ -343,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideAll() {
-        sliderCon.setVisibility(View.GONE);
+        sliderCon.setVisibility(View.INVISIBLE);
 
         hideList();
     }

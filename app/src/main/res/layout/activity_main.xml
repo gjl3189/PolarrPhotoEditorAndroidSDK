@@ -53,6 +53,15 @@
                 android:onClick="btnClicked"
                 android:text="Enhance Face_0"
                 android:textSize="8sp" />
+
+            <Button
+                android:id="@+id/btn_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="btnClicked"
+                android:text="Filters"
+                android:textSize="8sp" />
         </LinearLayout>
 
         <LinearLayout
