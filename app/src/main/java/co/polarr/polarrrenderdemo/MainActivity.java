@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         final CharSequence items[] = new CharSequence[mFilters.size()];
         for (int i = 0; i < mFilters.size(); i++) {
-            items[i] = mFilters.get(i).filterName("cn");
+            items[i] = mFilters.get(i).filterName("zh");
         }
         adb.setItems(items, new DialogInterface.OnClickListener() {
 
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
                 renderView.updateStates(filterItem.state);
 
-                final String label = "Filter:" + filterItem.filterName("cn");
+                final String label = "Filter:" + filterItem.filterName("zh");
                 labelTv.setText(label);
                 seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
