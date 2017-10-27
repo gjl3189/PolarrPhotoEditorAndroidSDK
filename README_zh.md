@@ -32,11 +32,12 @@ https://www.dropbox.com/sh/5idxxl9g8hq7171/AAAL3ctgl6o_cnhn8lxxd2Hca?dl=0
 // render sdk
 compile (name: 'renderer-release', ext: 'aar')
 ```
-### 可选的（仅仅用于二维码识别）
+### 可选的
 ```groovy
+// face detection
+compile(name: 'dlib-release', ext: 'aar')
 // qr code scanner and decoder
 compile (name: 'qrcode-release', ext: 'aar')
- 
 // qr code
 compile 'com.google.zxing:core:3.2.1'
 ```
@@ -102,10 +103,75 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
+## 自动增强
+### 全局自动增强
+返回值为全局自动增强后需要改变的调整值
+```java
+// call in gl thread
+Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+```
+### 面部自动增强
+进行面部自动增强前需要先[进行人脸识别](##人脸识别)
+```java
+//包含人脸识别后人脸信息的数据。这里可以是只包含人脸信息的数据，也可以是全部调整数据。
+Map<String, Object> faceStates;
+// 需要自动识别人脸的索引
+int faceIndex = 0;
+// 进行面部自动增强，并将增强后的参数设置给传入的map call in gl thread
+polarrRender.autoEnhanceFace(faceStates, faceIndex);
+// 更新渲染数据 call in gl thread
+polarrRender.updateStates(faceStates);
+```
+## 面部调整
+调整面部属性及渲染参数，需要先[进行人脸识别](##人脸识别)
+### 面部渲染参数调整
+```java
+// 识别人脸并返回渲染所需的人脸参数
+Map<String, Object> faceStates;
+// 获取面部参数信息
+List<FaceItem> faces = (List<FaceItem>) faceStates.get("faces");
+FaceItem faceItem = faces.get(index);
+FaceState faceAdjustments = faceItem.adjustments;
+
+faceAdjustments.skin_smoothness = 0; // 皮肤平滑 (-1f,+1f)
+faceAdjustments.skin_tone = 0; // 皮肤光泽 (-1f,+1f)
+faceAdjustments.skin_hue = 0; // 皮肤色相 (-1f,+1f)
+faceAdjustments.skin_saturation = 0;  // 皮肤饱和度 (-1f,+1f)
+faceAdjustments.skin_shadows = 0; // 皮肤阴影 (-1f,+1f)
+faceAdjustments.skin_highlights = 0; // 皮肤高光 (-1f,+1f)
+faceAdjustments.teeth_whitening = 0; // 牙齿美白 (0f,+1f)
+faceAdjustments.teeth_brightness = 0; // 牙齿亮度 (0f,+1f)
+faceAdjustments.eyes_brightness = 0; // 眼睛亮度 (0f,+1f)
+faceAdjustments.eyes_contrast = 0; // 眼睛对比度 (0f,+1f)
+faceAdjustments.eyes_clarity = 0; // 眼睛清晰度 (0f,+1f)
+faceAdjustments.lips_brightness = 0; // 嘴唇亮度 (0f,+1f)
+faceAdjustments.lips_saturation = 0; // 嘴唇饱和度 (-1f,+1f)
+```
+### 面部尺寸属性调整
+```java
+// 识别人脸并返回渲染所需的人脸参数
+Map<String, Object> faceStates;
+// 获取面部参数信息
+List<FaceFeaturesState> faceFeaturesStates = (List<FaceFeaturesState>) faceStates.get("face_features");
+FaceFeaturesState featureSate = faceFeaturesStates.get(index);
+
+featureSate.eye_size = {0, 0};  // 眼睛大小 {(-1f,+1f),(-1f,+1f)}
+featureSate.face_width = 0; // 脸宽 (-1f,+1f)
+featureSate.forehead_height = 0; // 前额高度 (-1f,+1f)
+featureSate.chin_height = 0; // 下巴高度 (-1f,+1f)
+featureSate.nose_width = 0; // 鼻子宽度 (-1f,+1f)
+featureSate.nose_height = 0; // 鼻子长度 (-1f,+1f)
+featureSate.mouth_width = 0; // 嘴宽度 (-1f,+1f)
+featureSate.mouth_height = 0; // 嘴高度 (-1f,+1f)
+featureSate.smile = 0; // 微笑程度 (-1f,+1f)
+```
 ## 重置图片
 重置图片为原始状态
 ```java
 stateMap.clear();
+// 如果需要重置人脸信息
+FaceUtil.ResetFaceStates(faceStates);
+
 // call in gl thread
 polarrRender.updateStates(stateMap);
 ```
@@ -179,6 +245,33 @@ polarrRender.release();
 | grain_amount | 0, +1 | [噪点程度](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-cheng-du.html)|
 | grain_size | 0, +1 | [噪点大小](http://polaxiong.com/wiki/hou-qi-shu-yu/zao-dian-da-xiao.html)|
 
+## 人脸识别
+```groovy
+dependencies {
+    // face detection
+    compile(name: 'dlib-release', ext: 'aar')
+}
+```
+### 识别人脸并返回渲染所需数据
+图片配置为ARGB8888、宽高不超过500像素可以获得较好结果和性能。由于人脸识别开销较大，需要在异步线程执行
+```java
+Bitmap scaledBitmap; //图片配置为ARGB8888、宽高不超过500像素可以获得较好结果和性能
+// 初始化识别工具
+FaceUtil.InitFaceUtil(context);
+// 识别人脸并返回渲染所需的人脸参数
+Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
+// 释放识别工具（一次初始化支持多次人脸识别）
+FaceUtil.Release();
+
+// 将人脸参数写入本地属性数组，并设置给渲染引擎
+localStateMap.putAll(faces);
+renderView.updateStates(localStateMap);
+```
+### 重置人脸信息
+```java
+// 不需要初始化识别工具
+FaceUtil.ResetFaceStates(faceStates);
+```
 ## 滤镜二维码
 ### 通过url请求滤镜信息
 ```java

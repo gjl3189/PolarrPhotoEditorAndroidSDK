@@ -29,6 +29,8 @@ compile (name: 'renderer-release', ext: 'aar')
 ```
 ### Optional
 ```groovy
+// face detection
+compile(name: 'dlib-release', ext: 'aar')
 // qr code scanner and decoder
 compile (name: 'qrcode-release', ext: 'aar')
  
@@ -97,10 +99,73 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
+## Auto enhance
+### Global auto enhance
+return the changed adjustments
+```java
+// call in gl thread
+Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+```
+### Face auto enhance
+Need do face detection first, [Face Detection](##Face Detection)
+```java
+// it includes face datas. Just face datas or all stats with face datas
+Map<String, Object> faceStates;
+int faceIndex = 0;
+// do face auto enhance and update the input map, call in gl thread
+polarrRender.autoEnhanceFace(faceStates, faceIndex);
+// update to render call in gl thread
+polarrRender.updateStates(faceStates);
+```
+## Face Adjustments
+Need do face detection first, [Face Detection](##Face Detection)
+### Adjust render adjustments of a face
+```java
+// Face detected data
+Map<String, Object> faceStates;
+// Get face adjustment
+List<FaceItem> faces = (List<FaceItem>) faceStates.get("faces");
+FaceItem faceItem = faces.get(index);
+FaceState faceAdjustments = faceItem.adjustments;
+
+faceAdjustments.skin_smoothness = 0; // (-1f,+1f)
+faceAdjustments.skin_tone = 0; // (-1f,+1f)
+faceAdjustments.skin_hue = 0; // (-1f,+1f)
+faceAdjustments.skin_saturation = 0;  // (-1f,+1f)
+faceAdjustments.skin_shadows = 0; // (-1f,+1f)
+faceAdjustments.skin_highlights = 0; // (-1f,+1f)
+faceAdjustments.teeth_whitening = 0; // (0f,+1f)
+faceAdjustments.teeth_brightness = 0; // (0f,+1f)
+faceAdjustments.eyes_brightness = 0; // (0f,+1f)
+faceAdjustments.eyes_contrast = 0; //  (0f,+1f)
+faceAdjustments.eyes_clarity = 0; // (0f,+1f)
+faceAdjustments.lips_brightness = 0; // (0f,+1f)
+faceAdjustments.lips_saturation = 0; // (-1f,+1f)
+```
+### Adjust each part sizes of a face
+```java
+// Face detected data
+Map<String, Object> faceStates;
+// Get face features
+List<FaceFeaturesState> faceFeaturesStates = (List<FaceFeaturesState>) faceStates.get("face_features");
+FaceFeaturesState featureSate = faceFeaturesStates.get(index);
+
+featureSate.eye_size = {0, 0};  // {(-1f,+1f),(-1f,+1f)}
+featureSate.face_width = 0; // (-1f,+1f)
+featureSate.forehead_height = 0; // (-1f,+1f)
+featureSate.chin_height = 0; // (-1f,+1f)
+featureSate.nose_width = 0; // (-1f,+1f)
+featureSate.nose_height = 0; // (-1f,+1f)
+featureSate.mouth_width = 0; // (-1f,+1f)
+featureSate.mouth_height = 0; // (-1f,+1f)
+featureSate.smile = 0; // (-1f,+1f)
+```
 ## Reset all state
 Reset image to original.
 ```java
 stateMap.clear();
+// if need reset face states
+FaceUtil.ResetFaceStates(faceStates);
 // call in gl thread
 polarrRender.updateStates(stateMap);
 ```
@@ -174,6 +239,33 @@ polarrRender.release();
 | grain_amount | 0, +1 |
 | grain_size | 0, +1 |
 
+## Face Detection
+```groovy
+dependencies {
+    // face detection
+    compile(name: 'dlib-release', ext: 'aar')
+}
+```
+### Get face datas for rendering
+Get better performance on ARGB8888, width or height less than 500px bitmap. Better runing in the async thread.
+```java
+Bitmap scaledBitmap; // better performance on ARGB8888, width or height less than 500px
+// Init the face util
+FaceUtil.InitFaceUtil(context);
+// Do face detection
+Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
+// Release face util
+FaceUtil.Release();
+
+// set face datas to local states, and set to render.
+localStateMap.putAll(faces);
+renderView.updateStates(localStateMap);
+```
+### Reset face datas
+```java
+// no need init the face util
+FaceUtil.ResetFaceStates(faceStates);
+```
 ## QR code
 ### QR code request from a url
 ```java

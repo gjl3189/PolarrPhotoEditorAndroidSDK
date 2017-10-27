@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBm, (int) (minScale * imageBm.getWidth()), (int) (minScale * imageBm.getHeight()), true);
                 FaceUtil.InitFaceUtil(MainActivity.this);
                 Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
+                FaceUtil.Release();
                 scaledBitmap.recycle();
 
                 faceStates = faces;
