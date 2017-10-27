@@ -19,7 +19,7 @@
 
 ## 效果展示
 
-泼辣修图SDK的参数调整效果超过主流大量英勇地调整效果，具体对比请见
+泼辣修图SDK的参数调整效果超过主流大量应用的调整效果，具体对比请见
 https://www.dropbox.com/sh/5idxxl9g8hq7171/AAAL3ctgl6o_cnhn8lxxd2Hca?dl=0
 
 # 易用性
@@ -271,6 +271,24 @@ renderView.updateStates(localStateMap);
 ```java
 // 不需要初始化识别工具
 FaceUtil.ResetFaceStates(faceStates);
+```
+## 滤镜工具
+SDK 内置了泼辣修图的滤镜包，滤镜包数据内置于renderer module中。
+### 获取滤镜列表
+```java
+// 获取滤镜包
+List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
+// 获取滤镜
+FilterItem filterItem = filterPackage.filters.get(0);
+```
+### 设置滤镜参数
+```java
+renderView.updateStates(filterItem.state);
+```
+### 调整滤镜程度
+```java
+float adjustmentValue = 0.5f; // 滤镜程度 (0f, 1f)
+Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(filterItem.state, adjustmentValue);
 ```
 ## 滤镜二维码
 ### 通过url请求滤镜信息

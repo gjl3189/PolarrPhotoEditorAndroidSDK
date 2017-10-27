@@ -266,6 +266,24 @@ renderView.updateStates(localStateMap);
 // no need init the face util
 FaceUtil.ResetFaceStates(faceStates);
 ```
+## Filter tools
+The filter raw datas are built in renderer module.
+### Get filter list
+```java
+// get filter packages
+List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
+// get a filter
+FilterItem filterItem = filterPackage.filters.get(0);
+```
+### Apply a filter
+```java
+renderView.updateStates(filterItem.state);
+```
+### Adjustment a filter
+```java
+float adjustmentValue = 0.5f; // (0f, 1f)
+Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(filterItem.state, adjustmentValue);
+```
 ## QR code
 ### QR code request from a url
 ```java
