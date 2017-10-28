@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn_auto_face:
                 renderView.autoEnhanceFace0(localStateMap);
+                break;
             case R.id.btn_add_radial:
                 setRadialMask();
                 break;
