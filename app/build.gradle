@@ -35,8 +35,12 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:25.3.1'
     testCompile 'junit:junit:4.12'
 
-    compile (name: 'renderer-release', ext: 'aar')
-    compile (name: 'qrcode-release', ext: 'aar')
+    // render engine
+    compile(name: 'renderer-release', ext: 'aar')
+    // face detection
+    compile(name: 'dlib-release', ext: 'aar')
+    // qr code
+    compile(name: 'qrcode-release', ext: 'aar')
 
     // qr code
     compile 'com.google.zxing:core:3.2.1'

@@ -101,6 +101,32 @@ public class DemoView extends GLSurfaceView {
         });
     }
 
+    public void autoEnhance(final Map<String, Object> statesMapToUpdate) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+                if (statesMapToUpdate != null) {
+                    statesMapToUpdate.putAll(changedStates);
+                }
+
+                requestRender();
+            }
+        });
+    }
+
+    public void autoEnhanceFace0(final Map<String, Object> faceStates) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.autoEnhanceFace(faceStates, 0);
+                polarrRender.updateStates(faceStates);
+
+                requestRender();
+            }
+        });
+    }
+
     public void releaseRender() {
         queueEvent(new Runnable() {
             @Override

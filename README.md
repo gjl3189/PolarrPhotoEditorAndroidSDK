@@ -29,6 +29,8 @@ compile (name: 'renderer-release', ext: 'aar')
 ```
 ### Optional
 ```groovy
+// face detection
+compile(name: 'dlib-release', ext: 'aar')
 // qr code scanner and decoder
 compile (name: 'qrcode-release', ext: 'aar')
  
@@ -97,10 +99,142 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
+## Auto enhance
+### Global auto enhance
+return the changed adjustments
+```java
+// call in gl thread
+Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+```
+### Face auto enhance
+Need do face detection first, [Face Detection](##Face Detection)
+```java
+// it includes face datas. Just face datas or all stats with face datas
+Map<String, Object> faceStates;
+int faceIndex = 0;
+// do face auto enhance and update the input map, call in gl thread
+polarrRender.autoEnhanceFace(faceStates, faceIndex);
+// update to render call in gl thread
+polarrRender.updateStates(faceStates);
+```
+## Face Adjustments
+Need do face detection first, [Face Detection](##Face Detection)
+### Adjust render adjustments of a face
+```java
+// Face detected data
+Map<String, Object> faceStates;
+// Get face adjustment
+List<FaceItem> faces = (List<FaceItem>) faceStates.get("faces");
+FaceItem faceItem = faces.get(index);
+FaceState faceAdjustments = faceItem.adjustments;
+
+faceAdjustments.skin_smoothness = 0; // (-1f,+1f)
+faceAdjustments.skin_tone = 0; // (-1f,+1f)
+faceAdjustments.skin_hue = 0; // (-1f,+1f)
+faceAdjustments.skin_saturation = 0;  // (-1f,+1f)
+faceAdjustments.skin_shadows = 0; // (-1f,+1f)
+faceAdjustments.skin_highlights = 0; // (-1f,+1f)
+faceAdjustments.teeth_whitening = 0; // (0f,+1f)
+faceAdjustments.teeth_brightness = 0; // (0f,+1f)
+faceAdjustments.eyes_brightness = 0; // (0f,+1f)
+faceAdjustments.eyes_contrast = 0; //  (0f,+1f)
+faceAdjustments.eyes_clarity = 0; // (0f,+1f)
+faceAdjustments.lips_brightness = 0; // (0f,+1f)
+faceAdjustments.lips_saturation = 0; // (-1f,+1f)
+```
+### Adjust each part sizes of a face
+```java
+// Face detected data
+Map<String, Object> faceStates;
+// Get face features
+List<FaceFeaturesState> faceFeaturesStates = (List<FaceFeaturesState>) faceStates.get("face_features");
+FaceFeaturesState featureSate = faceFeaturesStates.get(index);
+
+featureSate.eye_size = {0, 0};  // {(-1f,+1f),(-1f,+1f)}
+featureSate.face_width = 0; // (-1f,+1f)
+featureSate.forehead_height = 0; // (-1f,+1f)
+featureSate.chin_height = 0; // (-1f,+1f)
+featureSate.nose_width = 0; // (-1f,+1f)
+featureSate.nose_height = 0; // (-1f,+1f)
+featureSate.mouth_width = 0; // (-1f,+1f)
+featureSate.mouth_height = 0; // (-1f,+1f)
+featureSate.smile = 0; // (-1f,+1f)
+```
+## Local masks
+```java
+Adjustment localMask = new Adjustment();
+```
+### Local masks colorful adjustments
+```java
+LocalState maskAdjustment = localMask.adjustments;
+ 
+maskAdjustment.blur = 0.5f; // (0f, +1.5f)
+maskAdjustment.exposure = 0.5f; // (-1f, +1f)
+maskAdjustment.gamma = 0; // (-1f, +1f)
+maskAdjustment.temperature = 0.5f; // (-1f, +1f)
+maskAdjustment.tint = 0; // (-1f, +1f)
+maskAdjustment.saturation = 0; // (-1f, +1f)
+maskAdjustment.vibrance = 0; // (-1f, +1f)
+maskAdjustment.contrast = 0.3f; // (-1f, +1f)
+maskAdjustment.highlights = 0; // (-1f, +1f)
+maskAdjustment.shadows = -0.8f; // (-1f, +1f)
+maskAdjustment.clarity = 1f; // (-1f, +1f)
+maskAdjustment.mosaic_size = 0.2f; // (0, +1f)
+maskAdjustment.shadows_hue = 0; // For blending color (0, +1f)
+maskAdjustment.shadows_saturation = 0; // For blending color (0, +1f)
+maskAdjustment.dehaze = -0.2f; // (-1f, +1f)
+```
+### Radial mask
+```java
+Adjustment radialMask = new Adjustment();
+ 
+radialMask.type = "radial";
+radialMask.position = new float[]{0f, 0f}; // (-0.5f, +0.5f) from center of photo
+radialMask.size = new float[]{0.608f, 0.45f}; // (0f, +1f) width, height
+radialMask.feather = 0.1f;  // edge feather (0, +1f)
+radialMask.invert = true;
+ 
+radialMask.disabled = false; // if true, the mask won't be rendered
+ 
+// Need set the colorful adjustments
+LocalState maskAdjustment = radialMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+
+```
+### Gradient mask
+```java
+Adjustment gradientMask = new Adjustment();
+ 
+gradientMask.type = "gradient";
+gradientMask.startPoint = new float[]{0.12f, -0.36f}; // (-0.5f, +0.5f) from center
+gradientMask.endPoint = new float[]{-0.096f, 0.26f}; // (-0.5f, +0.5f) from center
+gradientMask.reflect = true;
+gradientMask.invert = false;
+ 
+gradientMask.disabled = false; // if true, the mask won't be rendered
+ 
+// Need set the colorful adjustments
+LocalState maskAdjustment = gradientMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+```
+### Set local masks
+```java
+// need create a mask first follow the above steps.
+Adjustment localMask;
+List<Adjustment> localMasks = new ArrayList<>();
+localMasks.add(localMask);
+localStateMap.put("local_adjustments", localMasks);
+
+renderView.updateStates(localStateMap);
+```
 ## Reset all state
 Reset image to original.
 ```java
 stateMap.clear();
+// if need reset face states
+FaceUtil.ResetFaceStates(faceStates);
 // call in gl thread
 polarrRender.updateStates(stateMap);
 ```
@@ -174,6 +308,51 @@ polarrRender.release();
 | grain_amount | 0, +1 |
 | grain_size | 0, +1 |
 
+## Face Detection
+```groovy
+dependencies {
+    // face detection
+    compile(name: 'dlib-release', ext: 'aar')
+}
+```
+### Get face datas for rendering
+Get better performance on ARGB8888, width or height less than 500px bitmap. Better runing in the async thread.
+```java
+Bitmap scaledBitmap; // better performance on ARGB8888, width or height less than 500px
+// Init the face util
+FaceUtil.InitFaceUtil(context);
+// Do face detection
+Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
+// Release face util
+FaceUtil.Release();
+
+// set face datas to local states, and set to render.
+localStateMap.putAll(faces);
+renderView.updateStates(localStateMap);
+```
+### Reset face datas
+```java
+// no need init the face util
+FaceUtil.ResetFaceStates(faceStates);
+```
+## Filter tools
+The filter raw datas are built in renderer module.
+### Get filter list
+```java
+// get filter packages
+List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
+// get a filter
+FilterItem filterItem = filterPackage.filters.get(0);
+```
+### Apply a filter
+```java
+renderView.updateStates(filterItem.state);
+```
+### Adjustment a filter
+```java
+float adjustmentValue = 0.5f; // (0f, 1f)
+Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(filterItem.state, adjustmentValue);
+```
 ## QR code
 ### QR code request from a url
 ```java
