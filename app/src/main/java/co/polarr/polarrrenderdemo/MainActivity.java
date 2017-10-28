@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
         Adjustment radialMask = new Adjustment();
         co.polarr.renderer.entities.Context.LocalState maskAdjustment = radialMask.adjustments;
 
-        maskAdjustment.blur = 0.5f; // (0f, +1f)
+        maskAdjustment.blur = 0.5f; // (0f, +1.5f)
         maskAdjustment.exposure = 0.5f; // (-1f, +1f)
         maskAdjustment.gamma = 0; // (-1f, +1f)
         maskAdjustment.temperature = 0.5f; // (-1f, +1f)

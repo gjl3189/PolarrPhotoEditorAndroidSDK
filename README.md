@@ -160,6 +160,75 @@ featureSate.mouth_width = 0; // (-1f,+1f)
 featureSate.mouth_height = 0; // (-1f,+1f)
 featureSate.smile = 0; // (-1f,+1f)
 ```
+## Local masks
+```java
+Adjustment localMask = new Adjustment();
+```
+### Local masks colorful adjustments
+```java
+LocalState maskAdjustment = localMask.adjustments;
+ 
+maskAdjustment.blur = 0.5f; // (0f, +1.5f)
+maskAdjustment.exposure = 0.5f; // (-1f, +1f)
+maskAdjustment.gamma = 0; // (-1f, +1f)
+maskAdjustment.temperature = 0.5f; // (-1f, +1f)
+maskAdjustment.tint = 0; // (-1f, +1f)
+maskAdjustment.saturation = 0; // (-1f, +1f)
+maskAdjustment.vibrance = 0; // (-1f, +1f)
+maskAdjustment.contrast = 0.3f; // (-1f, +1f)
+maskAdjustment.highlights = 0; // (-1f, +1f)
+maskAdjustment.shadows = -0.8f; // (-1f, +1f)
+maskAdjustment.clarity = 1f; // (-1f, +1f)
+maskAdjustment.mosaic_size = 0.2f; // (0, +1f)
+maskAdjustment.shadows_hue = 0; // For blending color (0, +1f)
+maskAdjustment.shadows_saturation = 0; // For blending color (0, +1f)
+maskAdjustment.dehaze = -0.2f; // (-1f, +1f)
+```
+### Radial mask
+```java
+Adjustment radialMask = new Adjustment();
+ 
+radialMask.type = "radial";
+radialMask.position = new float[]{0f, 0f}; // (-0.5f, +0.5f) from center of photo
+radialMask.size = new float[]{0.608f, 0.45f}; // (0f, +1f) width, height
+radialMask.feather = 0.1f;  // edge feather (0, +1f)
+radialMask.invert = true;
+ 
+radialMask.disabled = false; // if true, the mask won't be rendered
+ 
+// Need set the colorful adjustments
+LocalState maskAdjustment = radialMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+
+```
+### Gradient mask
+```java
+Adjustment gradientMask = new Adjustment();
+ 
+gradientMask.type = "gradient";
+gradientMask.startPoint = new float[]{0.12f, -0.36f}; // (-0.5f, +0.5f) from center
+gradientMask.endPoint = new float[]{-0.096f, 0.26f}; // (-0.5f, +0.5f) from center
+gradientMask.reflect = true;
+gradientMask.invert = false;
+ 
+gradientMask.disabled = false; // if true, the mask won't be rendered
+ 
+// Need set the colorful adjustments
+LocalState maskAdjustment = gradientMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+```
+### Set local masks
+```java
+// need create a mask first follow the above steps.
+Adjustment localMask;
+List<Adjustment> localMasks = new ArrayList<>();
+localMasks.add(localMask);
+localStateMap.put("local_adjustments", localMasks);
+
+renderView.updateStates(localStateMap);
+```
 ## Reset all state
 Reset image to original.
 ```java

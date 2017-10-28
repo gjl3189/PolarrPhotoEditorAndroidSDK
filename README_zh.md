@@ -132,7 +132,7 @@ Map<String, Object> faceStates;
 List<FaceItem> faces = (List<FaceItem>) faceStates.get("faces");
 FaceItem faceItem = faces.get(index);
 FaceState faceAdjustments = faceItem.adjustments;
-
+ 
 faceAdjustments.skin_smoothness = 0; // 皮肤平滑 (-1f,+1f)
 faceAdjustments.skin_tone = 0; // 皮肤光泽 (-1f,+1f)
 faceAdjustments.skin_hue = 0; // 皮肤色相 (-1f,+1f)
@@ -154,7 +154,7 @@ Map<String, Object> faceStates;
 // 获取面部参数信息
 List<FaceFeaturesState> faceFeaturesStates = (List<FaceFeaturesState>) faceStates.get("face_features");
 FaceFeaturesState featureSate = faceFeaturesStates.get(index);
-
+ 
 featureSate.eye_size = {0, 0};  // 眼睛大小 {(-1f,+1f),(-1f,+1f)}
 featureSate.face_width = 0; // 脸宽 (-1f,+1f)
 featureSate.forehead_height = 0; // 前额高度 (-1f,+1f)
@@ -164,6 +164,76 @@ featureSate.nose_height = 0; // 鼻子长度 (-1f,+1f)
 featureSate.mouth_width = 0; // 嘴宽度 (-1f,+1f)
 featureSate.mouth_height = 0; // 嘴高度 (-1f,+1f)
 featureSate.smile = 0; // 微笑程度 (-1f,+1f)
+```
+## 区域蒙版
+```java
+// 增加一个区域蒙版
+Adjustment localMask = new Adjustment();
+```
+### 区域蒙版的色彩调整属性
+```java
+LocalState maskAdjustment = localMask.adjustments;
+ 
+maskAdjustment.blur = 0.5f; // 模糊程度 (0f, +1.5f)
+maskAdjustment.exposure = 0.5f; // 曝光度 (-1f, +1f)
+maskAdjustment.gamma = 0; // 伽马值 (-1f, +1f)
+maskAdjustment.temperature = 0.5f; // 色温 (-1f, +1f)
+maskAdjustment.tint = 0; // 色调 (-1f, +1f)
+maskAdjustment.saturation = 0; // 饱和度 (-1f, +1f)
+maskAdjustment.vibrance = 0; // 自然饱和度 (-1f, +1f)
+maskAdjustment.contrast = 0.3f; // 对比度 (-1f, +1f)
+maskAdjustment.highlights = 0; // 高光 (-1f, +1f)
+maskAdjustment.shadows = -0.8f; // 阴影 (-1f, +1f)
+maskAdjustment.clarity = 1f; // 清晰度 (-1f, +1f)
+maskAdjustment.mosaic_size = 0.2f; // 马赛克 (0, +1f)
+maskAdjustment.shadows_hue = 0; // 阴影色调，用于改变选中区域颜色 (0, +1f)
+maskAdjustment.shadows_saturation = 0; // 阴影饱和度，用于改变选中区域颜色 (0, +1f)
+maskAdjustment.dehaze = -0.2f; // 去雾 (-1f, +1f)
+```
+### 圆形蒙版
+```java
+Adjustment radialMask = new Adjustment();
+ 
+radialMask.type = "radial"; // 蒙版类型为圆形蒙版
+radialMask.position = new float[]{0f, 0f}; // 中心位置 (-0.5f, +0.5f) from center of photo
+radialMask.size = new float[]{0.608f, 0.45f}; // 大小 (0f, +1f) width, height
+radialMask.feather = 0.1f;  // 边缘羽化值 (0, +1f)
+radialMask.invert = true; // 反转
+ 
+radialMask.disabled = false; // 是否禁用，禁用后将不应用该蒙版
+ 
+// 对蒙版设置色彩调整属性
+LocalState maskAdjustment = radialMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+
+```
+### 渐变蒙版
+```java
+Adjustment gradientMask = new Adjustment();
+ 
+gradientMask.type = "gradient"; // 蒙版类型为渐变蒙版
+gradientMask.startPoint = new float[]{0.12f, -0.36f}; // 起点 (-0.5f, +0.5f) from center
+gradientMask.endPoint = new float[]{-0.096f, 0.26f}; // 终点 (-0.5f, +0.5f) from center
+gradientMask.reflect = true; // 镜像
+gradientMask.invert = false; // 反转
+ 
+gradientMask.disabled = false; // 是否禁用，禁用后将不应用该蒙版
+ 
+// 对蒙版设置色彩调整属性
+LocalState maskAdjustment = gradientMask.adjustments;
+maskAdjustment.blur = 0.5f;
+...
+```
+### 设置并渲染蒙版
+```java
+// 前面创建好的蒙版
+Adjustment localMask;
+List<Adjustment> localMasks = new ArrayList<>();
+localMasks.add(localMask);
+localStateMap.put("local_adjustments", localMasks);
+
+renderView.updateStates(localStateMap);
 ```
 ## 重置图片
 重置图片为原始状态
@@ -262,7 +332,7 @@ FaceUtil.InitFaceUtil(context);
 Map<String, Object> faces = FaceUtil.DetectFace(scaledBitmap);
 // 释放识别工具（一次初始化支持多次人脸识别）
 FaceUtil.Release();
-
+ 
 // 将人脸参数写入本地属性数组，并设置给渲染引擎
 localStateMap.putAll(faces);
 renderView.updateStates(localStateMap);
