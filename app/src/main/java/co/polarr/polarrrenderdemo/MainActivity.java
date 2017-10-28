@@ -26,6 +26,7 @@ import java.util.Map;
 
 import co.polarr.qrcode.QRUtils;
 import co.polarr.renderer.FilterPackageUtil;
+import co.polarr.renderer.entities.Adjustment;
 import co.polarr.renderer.entities.FilterItem;
 import co.polarr.renderer.entities.FilterPackage;
 import co.polarr.renderer.utils.QRCodeUtil;
@@ -115,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn_auto_face:
                 renderView.autoEnhanceFace0(localStateMap);
+            case R.id.btn_add_radial:
+                setRadialMask();
+                break;
+            case R.id.btn_add_gradient:
+                setGradientMask();
                 break;
             case R.id.btn_filters:
                 showFilters();
@@ -246,6 +252,76 @@ public class MainActivity extends AppCompatActivity {
 
     private void releaseRender() {
         renderView.releaseRender();
+    }
+
+    private void setRadialMask() {
+        Adjustment radialMask = new Adjustment();
+        co.polarr.renderer.entities.Context.LocalState maskAdjustment = radialMask.adjustments;
+
+        maskAdjustment.blur = 0.5f; // (0f, +1f)
+        maskAdjustment.exposure = 0.5f; // (-1f, +1f)
+        maskAdjustment.gamma = 0; // (-1f, +1f)
+        maskAdjustment.temperature = 0.5f; // (-1f, +1f)
+        maskAdjustment.tint = 0; // (-1f, +1f)
+        maskAdjustment.saturation = 0; // (-1f, +1f)
+        maskAdjustment.vibrance = 0; // (-1f, +1f)
+        maskAdjustment.contrast = 0.3f; // (-1f, +1f)
+        maskAdjustment.highlights = 0; // (-1f, +1f)
+        maskAdjustment.shadows = -0.8f; // (-1f, +1f)
+        maskAdjustment.clarity = 1f; // (-1f, +1f)
+        maskAdjustment.mosaic_size = 0.2f; // (0, +1f)
+        maskAdjustment.shadows_hue = 0; // (0, +1f)
+        maskAdjustment.shadows_saturation = 0; // (0, +1f)
+        maskAdjustment.dehaze = -0.2f; // (-1f, +1f)
+
+        radialMask.type = "radial";
+        radialMask.position = new float[]{0f, 0f}; // (-0.5f, +0.5f) from center of photo
+        radialMask.size = new float[]{0.608f, 0.45f}; // (0f, +1f) width, height
+        radialMask.feather = 0.1f;  // (0, +1f)
+        radialMask.invert = true;
+
+        radialMask.disabled = false;
+
+        List<Adjustment> localMasks = new ArrayList<>();
+        localMasks.add(radialMask);
+        localStateMap.put("local_adjustments", localMasks);
+
+        renderView.updateStates(localStateMap);
+    }
+
+    private void setGradientMask() {
+        Adjustment gradientMask = new Adjustment();
+        co.polarr.renderer.entities.Context.LocalState maskAdjustment = gradientMask.adjustments;
+
+        maskAdjustment.blur = 0f; // (0f, +1.5f)
+        maskAdjustment.exposure = -0.4f; // (-1f, +1f)
+        maskAdjustment.gamma = 0; // (-1f, +1f)
+        maskAdjustment.temperature = 0f; // (-1f, +1f)
+        maskAdjustment.tint = 0; // (-1f, +1f)
+        maskAdjustment.saturation = -1; // (-1f, +1f)
+        maskAdjustment.vibrance = 0; // (-1f, +1f)
+        maskAdjustment.contrast = -0.9f; // (-1f, +1f)
+        maskAdjustment.highlights = 0; // (-1f, +1f)
+        maskAdjustment.shadows = 0f; // (-1f, +1f)
+        maskAdjustment.clarity = -1f; // (-1f, +1f)
+        maskAdjustment.mosaic_size = 0f; // (0, +1f)
+        maskAdjustment.shadows_hue = 0.6f; // (0, +1f)
+        maskAdjustment.shadows_saturation = 0.5f; // (0, +1f)
+        maskAdjustment.dehaze = 0f; // (-1f, +1f)
+
+        gradientMask.type = "gradient";
+        gradientMask.startPoint = new float[]{0.12f, -0.36f}; // (-0.5f, +0.5f) from center
+        gradientMask.endPoint = new float[]{-0.096f, 0.26f}; // (-0.5f, +0.5f) from center
+        gradientMask.reflect = true;
+        gradientMask.invert = false;
+
+        gradientMask.disabled = false;
+
+        List<Adjustment> localMasks = new ArrayList<>();
+        localMasks.add(gradientMask);
+        localStateMap.put("local_adjustments", localMasks);
+
+        renderView.updateStates(localStateMap);
     }
 
     private void showFilters() {
