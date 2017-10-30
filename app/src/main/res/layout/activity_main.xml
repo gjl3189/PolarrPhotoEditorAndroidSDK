@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="btnClicked"
-                    android:text="Mosic brush"
+                    android:text="Mosaic brush"
                     android:textSize="8sp" />
 
                 <Button
