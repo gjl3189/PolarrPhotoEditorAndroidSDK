@@ -43,6 +43,15 @@
                     android:textSize="8sp" />
 
                 <Button
+                    android:id="@+id/btn_add_mosaic_brush"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Mosic brush"
+                    android:textSize="8sp" />
+
+                <Button
                     android:id="@+id/btn_auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -85,15 +94,6 @@
                     android:layout_weight="1"
                     android:onClick="btnClicked"
                     android:text="Gradient mask"
-                    android:textSize="8sp" />
-
-                <Button
-                    android:id="@+id/btn_add_mosaic_brush"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="btnClicked"
-                    android:text="Mosic brush"
                     android:textSize="8sp" />
             </LinearLayout>
         </HorizontalScrollView>
