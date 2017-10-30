@@ -23,65 +23,80 @@
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
-        <LinearLayout
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:scrollbarAlwaysDrawHorizontalTrack="true">
 
-            <Button
-                android:id="@+id/btn_addjustment"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Adjusts"
-                android:textSize="8sp" />
+                android:gravity="center_vertical">
 
-            <Button
-                android:id="@+id/btn_auto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Auto Enhance"
-                android:textSize="8sp" />
+                <Button
+                    android:id="@+id/btn_addjustment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Adjusts"
+                    android:textSize="8sp" />
 
-            <Button
-                android:id="@+id/btn_auto_face"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Enhance Face_0"
-                android:textSize="8sp" />
+                <Button
+                    android:id="@+id/btn_auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Auto Enhance"
+                    android:textSize="8sp" />
 
-            <Button
-                android:id="@+id/btn_filters"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Filters"
-                android:textSize="8sp" />
+                <Button
+                    android:id="@+id/btn_auto_face"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Enhance Face_0"
+                    android:textSize="8sp" />
 
-            <Button
-                android:id="@+id/btn_add_radial"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Radial mask"
-                android:textSize="8sp" />
+                <Button
+                    android:id="@+id/btn_filters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Filters"
+                    android:textSize="8sp" />
 
-            <Button
-                android:id="@+id/btn_add_gradient"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="btnClicked"
-                android:text="Gradient mask"
-                android:textSize="8sp" />
-        </LinearLayout>
+                <Button
+                    android:id="@+id/btn_add_radial"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Radial mask"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btn_add_gradient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Gradient mask"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btn_add_mosaic_brush"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="btnClicked"
+                    android:text="Mosic brush"
+                    android:textSize="8sp" />
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <LinearLayout
             android:id="@+id/slider"
