@@ -180,6 +180,7 @@ maskAdjustment.highlights = 0; // (-1f, +1f)
 maskAdjustment.shadows = -0.8f; // (-1f, +1f)
 maskAdjustment.clarity = 1f; // (-1f, +1f)
 maskAdjustment.mosaic_size = 0.2f; // (0, +1f)
+maskAdjustment.mosaic_pattern = "square";// "square","hexagon","dot","triangle","diamond"
 maskAdjustment.shadows_hue = 0; // For blending color (0, +1f)
 maskAdjustment.shadows_saturation = 0; // For blending color (0, +1f)
 maskAdjustment.dehaze = -0.2f; // (-1f, +1f)
@@ -217,6 +218,38 @@ gradientMask.disabled = false; // if true, the mask won't be rendered
 // Need set the colorful adjustments
 LocalState maskAdjustment = gradientMask.adjustments;
 maskAdjustment.blur = 0.5f;
+...
+```
+### Brush mask
+```java
+Adjustment brushMask = new Adjustment();
+ 
+brushMask.type = "brush";
+BrushItem brushItem = new BrushItem();
+brushMask.brush.add(brushItem);
+ 
+brushItem.blend = false;
+brushItem.erase = false;
+brushItem.channel = new float[]{1f, 0f, 0f, 0f}; // rgba same as brushMask.channel
+brushItem.flow = 0.5f; // (0, +1f)
+brushItem.hardness = 0.5f; // (0, +1f)
+brushItem.size = 0.5f; // (0, +1f)
+Float[] points = {
+        0.097f, 0.68f, 0.5f, 0.1045f, 0.6665f, 0.5f, 0.1125f, 0.653f, 0.5f, 0.122f, 0.6405f, 0.5f, 0.1315f, 0.6275f, 0.5f, 0.141f, 0.6145f, 0.5f, 0.15f, 0.6015f, 0.5f, 0.1595f, 0.589f, 0.5f, 0.169f, 0.576f, 0.5f, 0.179f, 0.5635f, 0.5f, 0.189f, 0.551f, 0.5f, 0.199f, 0.538f, 0.5f, 0.208f, 0.525f, 0.5f, 0.217f, 0.512f, 0.5f, 0.2265f, 0.4995f, 0.5f, 0.2365f, 0.4865f, 0.5f, 0.246f, 0.474f, 0.5f, 0.256f, 0.4615f, 0.5f, 0.2675f, 0.4495f, 0.5f, 0.277f, 0.4365f, 0.5f, 0.2865f, 0.424f, 0.5f, 0.297f, 0.4115f, 0.5f, 0.3075f, 0.399f, 0.5f, 0.3185f, 0.387f, 0.5f, 0.3295f, 0.375f, 0.5f, 0.34f, 0.363f, 0.5f, 0.351f, 0.3505f, 0.5f, 0.3615f, 0.338f, 0.5f, 0.371f, 0.3255f, 0.5f, 0.3805f, 0.3125f, 0.5f, 0.3885f, 0.299f, 0.5f, 0.397f, 0.286f, 0.5f, 0.4065f, 0.273f, 0.5f, 0.4165f, 0.2605f, 0.5f, 0.426f, 0.2475f, 0.5f, 0.435f, 0.235f, 0.5f, 0.447f, 0.223f, 0.5f, 0.4585f, 0.2115f, 0.5f, 0.4715f, 0.2005f, 0.5f, 0.4845f, 0.1895f, 0.5f, 0.4975f, 0.1785f, 0.5f, 0.5115f, 0.168f, 0.5f, 0.527f, 0.1595f, 0.5f, 0.543f, 0.151f, 0.5f, 0.556f, 0.14f, 0.5f, 0.5675f, 0.152f, 0.5f, 0.576f, 0.1655f, 0.5f, 0.5855f, 0.178f, 0.5f, 0.595f, 0.191f, 0.5f, 0.6045f, 0.204f, 0.5f, 0.6135f, 0.2165f, 0.5f, 0.6235f, 0.2295f, 0.5f, 0.633f, 0.242f, 0.5f, 0.6425f, 0.255f, 0.5f, 0.652f, 0.268f, 0.5f, 0.6615f, 0.2805f, 0.5f, 0.671f, 0.2935f, 0.5f, 0.6805f, 0.3065f, 0.5f, 0.6895f, 0.319f, 0.5f, 0.6995f, 0.332f, 0.5f, 0.71f, 0.3445f, 0.5f, 0.7215f, 0.356f, 0.5f, 0.733f, 0.368f, 0.5f, 0.744f, 0.38f, 0.5f, 0.754f, 0.3925f, 0.5f, 0.7645f, 0.405f, 0.5f, 0.773f, 0.4185f, 0.5f, 0.781f, 0.4315f, 0.5f, 0.7905f, 0.4445f, 0.5f, 0.8f, 0.457f, 0.5f, 0.811f, 0.4695f, 0.5f, 0.824f, 0.48f, 0.5f, 0.838f, 0.4905f, 0.5f, 0.8525f, 0.5005f, 0.5f, 0.866f, 0.511f, 0.5f, 0.8785f, 0.5225f, 0.5f, 0.8885f, 0.535f, 0.5f, 0.8965f, 0.548f, 0.5f, 0.887f, 0.561f, 0.5f, 0.869f, 0.567f, 0.5f, 0.8645f, 0.581f, 0.5f, 0.869f, 0.5955f, 0.5f, 0.876f, 0.609f, 0.5f, 0.8795f, 0.6235f, 0.5f, 0.879f, 0.638f, 0.5f, 0.874f, 0.6525f, 0.5f, 0.8695f, 0.6665f, 0.5f, 0.865f, 0.681f, 0.5f, 0.8585f, 0.6945f, 0.5f, 0.8515f, 0.7085f, 0.5f, 0.8445f, 0.722f, 0.5f, 0.8375f, 0.7355f, 0.5f, 0.83f, 0.7495f, 0.5f, 0.82f, 0.762f, 0.5f, 0.81f, 0.7745f, 0.5f, 0.799f, 0.7865f, 0.5f, 0.788f, 0.7985f, 0.5f, 0.7755f, 0.81f, 0.5f, 0.7635f, 0.8215f, 0.5f, 0.7505f, 0.8325f, 0.5f, 0.7355f, 0.842f, 0.5f, 0.7205f, 0.8515f, 0.5f, 0.7035f, 0.858f, 0.5f, 0.6855f, 0.8645f, 0.5f, 0.667f, 0.8685f, 0.5f, 0.648f, 0.873f, 0.5f, 0.6295f, 0.8765f, 0.5f, 0.61f, 0.8795f, 0.5f, 0.591f, 0.882f, 0.5f, 0.5715f, 0.884f, 0.5f, 0.552f, 0.8845f, 0.5f, 0.5325f, 0.885f, 0.5f, 0.513f, 0.8845f, 0.5f, 0.4935f, 0.8835f, 0.5f, 0.474f, 0.882f, 0.5f, 0.4545f, 0.88f, 0.5f, 0.435f, 0.8785f, 0.5f, 0.416f, 0.8765f, 0.5f, 0.397f, 0.873f, 0.5f, 0.378f, 0.869f, 0.5f, 0.359f, 0.8655f, 0.5f, 0.3405f, 0.8605f, 0.5f, 0.3225f, 0.8555f, 0.5f, 0.304f, 0.851f, 0.5f, 0.2865f, 0.844f, 0.5f, 0.2695f, 0.837f, 0.5f, 0.253f, 0.829f, 0.5f, 0.236f, 0.8215f, 0.5f, 0.2195f, 0.814f, 0.5f, 0.204f, 0.805f, 0.5f, 0.1885f, 0.796f, 0.5f, 0.1725f, 0.7875f, 0.5f, 0.158f, 0.7775f, 0.5f, 0.1435f, 0.768f, 0.5f, 0.129f, 0.7585f, 0.5f, 0.1165f, 0.747f, 0.5f, 0.1045f, 0.7355f, 0.5f, 0.096f, 0.722f, 0.5f, 0.0905f, 0.708f, 0.5f, 0.085f, 0.694f, 0.5f, 0.085f, 0.6795f, 0.5f, 0.0905f, 0.6655f, 0.5f, 0.0955f, 0.651f, 0.5f, 0.1075f, 0.6395f, 0.5f
+};
+brushItem.points = Arrays.asList(points); // point: {x, y, z} (0, +1f), 'z' means pressure
+ 
+brushMask.channel = new float[]{1f, 0f, 0f, 0f}; //rgba same as brushItem.channel
+brushMask.invert = false;
+ 
+brushMask.disabled = false; // if true, the mask won't be rendered
+ 
+// Need set the colorful adjustments
+LocalState maskAdjustment = brushMask.adjustments;
+maskAdjustment.exposure = 0.6f; // (-1f, +1f)
+maskAdjustment.temperature = -0.8f; // (-1f, +1f)
+maskAdjustment.mosaic_size = 0.05f; // (0, +1f)
+maskAdjustment.mosaic_pattern = "dot";// "square","hexagon","dot","triangle","diamond"
 ...
 ```
 ### Set local masks
@@ -307,7 +340,9 @@ polarrRender.release();
 |  |  |
 | grain_amount | 0, +1 |
 | grain_size | 0, +1 |
-
+|  |  |
+| mosaic_size | 0, +1 |
+| mosaic_pattern | "square","hexagon","dot","triangle","diamond" |
 ## Face Detection
 ```groovy
 dependencies {
