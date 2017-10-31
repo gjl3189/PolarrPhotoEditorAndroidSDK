@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
 
         brushItem.flow = 0.8f; // (0, +1f)
         brushItem.size = 0.5f; // (0, +1f)
-        brushItem.mode = "paint"; // (0, +1f)
+        brushItem.mode = "paint"; // mask, paint
         brushItem.texture = paintType; // "stroke_1","stroke_2","stroke_3","stroke_4","dot","speckles","chalk"
 
         Float[] points = {
