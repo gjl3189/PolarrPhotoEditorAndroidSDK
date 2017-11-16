@@ -300,6 +300,16 @@ localStateMap.put("local_adjustments", localMasks);
 
 renderView.updateStates(localStateMap);
 ```
+## 消除笔
+消除区域图片要求：
+1. 同原始图片大小一致
+2. 背景为纯黑色 RGB (#000000)
+3. 消除区域为纯白色 RGB (#FFFFFF)
+```java
+// 消除区域图片
+Bitmap mask = BitmapFactory.decodeResource(getResources(), maskRid);
+polarrRender.magicEarser(mask);
+```
 ## 重置图片
 重置图片为原始状态
 ```java

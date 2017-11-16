@@ -175,6 +175,41 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_filters:
                 showFilters();
                 break;
+            case R.id.btn_eraser:
+
+                AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                final CharSequence items[] = {
+                        "tatoo",
+                        "animal",
+                        "bird",
+                        "rocks",
+                };
+                adb.setItems(items, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int n) {
+                        switch (n) {
+                            case 0:
+                                setEraser(R.mipmap.a1, R.mipmap.a2);
+                                break;
+                            case 1:
+                                setEraser(R.mipmap.b1, R.mipmap.b2);
+                                break;
+                            case 2:
+                                setEraser(R.mipmap.c1, R.mipmap.c2);
+                                break;
+                            case 3:
+                                setEraser(R.mipmap.rocks_small, R.mipmap.rocks_small_mask);
+                                break;
+                        }
+                    }
+
+                });
+                adb.setNegativeButton("Cancel", null);
+                adb.setTitle("Choose a demo photo:");
+                adb.show();
+
+                break;
         }
     }
 
@@ -302,6 +337,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void releaseRender() {
         renderView.releaseRender();
+    }
+
+    private void setEraser(final int srcRid, final int maskRid) {
+        final BitmapFactory.Options option = new BitmapFactory.Options();
+        option.inScaled = false;
+        Bitmap imageBm = BitmapFactory.decodeResource(getResources(), srcRid, option);
+        renderView.importImage(imageBm);
+        renderView.setAlpha(1);
+
+        Toast.makeText(this, "Start processing in 2 sec...", Toast.LENGTH_SHORT).show();
+        renderView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap mask = BitmapFactory.decodeResource(getResources(), maskRid, option);
+
+                renderView.renderMagicEraser(mask);
+            }
+        }, 2000);
     }
 
     private void setRadialMask() {

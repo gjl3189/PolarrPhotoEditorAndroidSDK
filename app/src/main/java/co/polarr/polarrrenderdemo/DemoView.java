@@ -2,9 +2,11 @@ package co.polarr.polarrrenderdemo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.os.Build;
 import android.util.AttributeSet;
 
 import java.util.Map;
@@ -27,10 +29,22 @@ public class DemoView extends GLSurfaceView {
     public DemoView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         setRenderer(render);
 
         polarrRender = new PolarrRender();
+    }
+
+    public void renderMagicEraser(final Bitmap mask) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.magicEarser(mask);
+                mask.recycle();
+
+                requestRender();
+            }
+        });
     }
 
     private class DemoRender implements Renderer {
