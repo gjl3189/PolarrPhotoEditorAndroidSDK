@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId "co.polarr.polarrcamerademo"
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
         versionName "0.1"
