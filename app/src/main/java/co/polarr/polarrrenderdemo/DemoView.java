@@ -2,11 +2,9 @@ package co.polarr.polarrrenderdemo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.os.Build;
 import android.util.AttributeSet;
 
 import java.util.Map;
@@ -22,9 +20,13 @@ import co.polarr.renderer.filters.Basic;
  */
 
 public class DemoView extends GLSurfaceView {
+    private static final String TAG = "DEBUG";
     private PolarrRender polarrRender;
     private DemoRender render = new DemoRender();
     private int inputTexture;
+
+    // benchmark
+    private long lastTraceTime = 0;
 
     public DemoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,7 +41,9 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                polarrRender.magicEarser(mask);
+                BenchmarkUtil.TimeStart("magicEraser");
+                polarrRender.magicEraser(mask);
+                BenchmarkUtil.TimeEnd("magicEraser");
                 mask.recycle();
 
                 requestRender();
@@ -52,13 +56,20 @@ public class DemoView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             genInputTexture();
+            BenchmarkUtil.MemStart("initRender");
+            BenchmarkUtil.MemStart("AllSDK");
+            BenchmarkUtil.TimeStart("initRender");
             polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+            BenchmarkUtil.TimeEnd("initRender");
+            BenchmarkUtil.MemEnd("initRender");
             polarrRender.setInputTexture(inputTexture);
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
+            BenchmarkUtil.TimeStart("updateSize");
             polarrRender.updateSize(width, height);
+            BenchmarkUtil.TimeEnd("updateSize");
         }
 
         @Override
@@ -69,6 +80,11 @@ public class DemoView extends GLSurfaceView {
             Basic filter = Basic.getInstance(getResources());
             filter.setInputTextureId(polarrRender.getOutputId());
             filter.draw();
+
+            if (System.currentTimeMillis() - lastTraceTime > 2000) {
+                BenchmarkUtil.MemEnd("AllSDK");
+                lastTraceTime = System.currentTimeMillis();
+            }
         }
     }
 
@@ -78,7 +94,6 @@ public class DemoView extends GLSurfaceView {
             public void run() {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
-
                 polarrRender.updateInputTexture();
             }
         });
@@ -110,7 +125,9 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
+                BenchmarkUtil.TimeStart("updateStates");
                 polarrRender.updateStates(statesMap);
+                BenchmarkUtil.TimeEnd("updateStates");
             }
         });
     }
@@ -119,7 +136,10 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
+                BenchmarkUtil.TimeStart("autoEnhanceGlobal");
                 Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+                BenchmarkUtil.TimeEnd("autoEnhanceGlobal");
+
                 if (statesMapToUpdate != null) {
                     statesMapToUpdate.putAll(changedStates);
                 }
@@ -133,7 +153,9 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
+                BenchmarkUtil.TimeStart("autoEnhanceFace");
                 polarrRender.autoEnhanceFace(faceStates, 0);
+                BenchmarkUtil.TimeEnd("autoEnhanceFace");
                 polarrRender.updateStates(faceStates);
 
                 requestRender();
