@@ -63,12 +63,24 @@ GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
 // 输入Texture变化后需要调用
 polarrRender.updateInputTexture();
 ```
-### 传入一个Texture
+### 传入一个输入Texture
 ```java
+//  默认为GL_TEXTURE_2D格式
 polarrRender.setInputTexture(inputTexture);
-
 // 输入Texture变化后需要调用
 polarrRender.updateInputTexture();
+```
+### 传入不同类型的输入Texture
+```java
+polarrRender.setInputTexture(inputTexture, textureType); // PolarrRender.TEXTURE_2D, PolarrRender.EXTERNAL_OES
+// 输入Texture变化后需要调用
+polarrRender.updateInputTexture();
+```
+## 设置输出Texture (非必须)
+如果不设置输出Texture，SDK将会创建一个输出Texture。通过[获取输出的Texture](#获取输出的Texture)获取
+```java
+//  必须为GL_TEXTURE_2D格式
+polarrRender.setOutputTexture(outputTexture);
 ```
 ## 更新渲染尺寸。更新后需要更新输入Texture
 ```java
@@ -320,7 +332,7 @@ FaceUtil.ResetFaceStates(faceStates);
 // call in gl thread
 polarrRender.updateStates(stateMap);
 ```
-## 获取输入的Texture
+## 获取输出的Texture
 ```java
 int out = polarrRender.getOutputId();
 ```

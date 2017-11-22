@@ -20,6 +20,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import co.polarr.renderer.PolarrRender;
+import co.polarr.renderer.filters.Basic;
 
 /**
  * Created by Colin on 2017/11/18.
@@ -39,6 +40,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
     private final OESTexture mCameraTexture = new OESTexture();
     //    private final Shader mOffscreenShader = new Shader();
     private PolarrRender polarrRender = new PolarrRender();
+    private int mOutputTexture;
 
     private int mWidth, mHeight;
     private boolean updateTexture = false;
@@ -75,15 +77,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public synchronized void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //load and compile shader
-
-        try {
-            polarrRender.initRender(getResources(), 512, 512, null);
-            polarrRender.setNeedDrawScreen(true);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        polarrRender.initRender(getResources(), 512, 512, null);
     }
 
     @Override
@@ -91,11 +85,14 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         mWidth = width;
         mHeight = height;
 
+        mOutputTexture = genOutputTexture();
+        polarrRender.setOutputTexture(mOutputTexture);
+
         polarrRender.updateSize(mWidth, mHeight);
 
         //generate camera texture------------------------
         mCameraTexture.init();
-        polarrRender.setInputTexture(mCameraTexture.getTextureId());
+        polarrRender.setInputTexture(mCameraTexture.getTextureId(), PolarrRender.EXTERNAL_OES);
 
         //set up surfacetexture------------------
         SurfaceTexture oldSurfaceTexture = mSurfaceTexture;
@@ -104,7 +101,6 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         if (oldSurfaceTexture != null) {
             oldSurfaceTexture.release();
         }
-
 
         //set camera para-----------------------------------
         int camera_width = 0;
@@ -173,10 +169,17 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             mSurfaceTexture.updateTexImage();
             updateTexture = false;
 
-            polarrRender.updateOESTexture(mSurfaceTexture, mOrientationM);
+            polarrRender.updateInputTexture();
+            polarrRender.drawFrame();
 
             GLES20.glViewport(0, 0, mWidth, mHeight);
-            polarrRender.drawFrameOES();
+            // demo draw screen
+            Basic filter = Basic.getInstance(getResources());
+            filter.setInputTextureId(mOutputTexture);
+            // update the matrix for camera orientation
+            Matrix.setIdentityM(filter.getMatrix(), 0);
+            Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+            filter.draw();
         }
     }
 
@@ -209,11 +212,30 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             @Override
             public void run() {
                 Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-                bitmap.copyPixelsFromBuffer(readTexture(polarrRender.getOutputId(), mWidth, mHeight));
+                bitmap.copyPixelsFromBuffer(readTexture(mOutputTexture, mWidth, mHeight));
 
                 onCaptureCallback.onPhoto(bitmap);
             }
         });
+    }
+
+    private int genOutputTexture() {
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+
+        int texture = textures[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mWidth, mHeight,
+                0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+        return texture;
     }
 
     private static ByteBuffer readTexture(int texId, int width, int height) {

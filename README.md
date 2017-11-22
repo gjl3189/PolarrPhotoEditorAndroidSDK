@@ -59,12 +59,30 @@ GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
 // call after input texture changed
 polarrRender.updateInputTexture();
 ```
-### Set an input texture and bind
+### Set an input texture
 ```java
+// GL_TEXTURE_2D by default
 polarrRender.setInputTexture(inputTexture);
 
 // call after input texture changed
 polarrRender.updateInputTexture();
+```
+### Set a different type of input texture
+```java
+polarrRender.setInputTexture(inputTexture, textureType); // PolarrRender.TEXTURE_2D, PolarrRender.EXTERNAL_OES
+// call after input texture changed
+polarrRender.updateInputTexture();
+```
+## set output texture (not required)
+If don't set the output texture, it will create an output texture. see[Get output texture](#get-output-texture)
+```java
+//  texture type should be GL_TEXTURE_2D
+polarrRender.setOutputTexture(outputTexture);
+```
+## 更新渲染尺寸。更新后需要更新输入Texture
+```java
+// call in gl thread
+polarrRender.updateSize(width, height);
 ```
 ## Update render size, need rebind input texture.
 ```java
