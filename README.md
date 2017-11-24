@@ -79,11 +79,6 @@ If don't set the output texture, it will create an output texture. see[Get outpu
 //  texture type should be GL_TEXTURE_2D
 polarrRender.setOutputTexture(outputTexture);
 ```
-## 更新渲染尺寸。更新后需要更新输入Texture
-```java
-// call in gl thread
-polarrRender.updateSize(width, height);
-```
 ## Update render size, need rebind input texture.
 ```java
 // call in gl thread
@@ -116,6 +111,27 @@ public void onDrawFrame(GL10 gl) {
     // call in GL thread
     polarrRender.drawFrame();
 }
+```
+## Optimized for real-time preview
+### Fast update input texture
+Replace *polarrRender.updateInputTexture();*
+```java
+polarrRender.fastUpdateInput();
+```
+### Fast apply a polarr filter
+A polarr filter is required, check [Get filter list](#get-filter-list)
+
+Replace *polarrRender.updateStates(stateMap);*
+```java
+FilterItem polarrFilter;
+polarrRender.fastUpdateStates(polarrFilter.state);
+```
+### Fast draw
+Only for the thumbnail preview. It might loss some details
+
+Replace *polarrRender.drawFrame();*
+```java
+polarrRender.fastDrawFrame();
 ```
 ## Auto enhance
 ### Global auto enhance

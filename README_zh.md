@@ -115,6 +115,27 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
+## 为视频应用优化的接口
+### 快速更新输入Texture
+替换 *polarrRender.updateInputTexture();*
+```java
+polarrRender.fastUpdateInput();
+```
+### 快速应用Polarr滤镜
+必须传入一个Polarr滤镜, 滤镜获取方式参考 [获取滤镜列表](#获取滤镜列表)
+
+替换 *polarrRender.updateStates(stateMap);*
+```java
+FilterItem polarrFilter;
+polarrRender.fastUpdateStates(polarrFilter.state);
+```
+### 快速渲染
+会损失一些滤镜细节，只在小尺寸预览时使用
+
+替换 *polarrRender.drawFrame();*
+```java
+polarrRender.fastDrawFrame();
+```
 ## 自动增强
 ### 全局自动增强
 返回值为全局自动增强后需要改变的调整值

@@ -8,13 +8,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btn_filters"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="Filters" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filters" />
+
+        <Button
+            android:id="@+id/btn_random_9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Random 9" />
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/btn_photo"

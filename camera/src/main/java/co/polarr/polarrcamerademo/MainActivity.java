@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
                         FilterItem filterItem = mFilters.get(n);
 
                         mRenderer.updateFilter(filterItem.state);
+
                         currentFilterName = items[n].toString();
                         btnFilters.setText(currentFilterName);
                     }
@@ -95,6 +96,17 @@ public class MainActivity extends Activity {
                 adb.setNegativeButton("Cancel", null);
                 adb.setTitle("Choose a filter:");
                 adb.show();
+            }
+        });
+
+        findViewById(R.id.btn_random_9).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<FilterItem> testFilters = new ArrayList<>();
+                for (int i = 0; i < 9; i++) {
+                    testFilters.add(mFilters.get((int) (Math.random() * mFilters.size())));
+                }
+                mRenderer.setTestFilters(testFilters);
             }
         });
     }

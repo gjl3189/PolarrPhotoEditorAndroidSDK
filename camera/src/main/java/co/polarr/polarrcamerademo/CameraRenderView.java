@@ -20,6 +20,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import co.polarr.renderer.PolarrRender;
+import co.polarr.renderer.entities.FilterItem;
 import co.polarr.renderer.filters.Basic;
 
 /**
@@ -28,6 +29,9 @@ import co.polarr.renderer.filters.Basic;
  */
 
 public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
+    private static final int GRID_SIZE = 3;
+    private static final int GRID_WIDTH = 320;
+    private static final int GRID_HEIGHT = 480;
     private Context mContext;
 
     /**
@@ -41,14 +45,12 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
     //    private final Shader mOffscreenShader = new Shader();
     private PolarrRender polarrRender = new PolarrRender();
     private int mOutputTexture;
-
     private int mWidth, mHeight;
     private boolean updateTexture = false;
-
-    /**
-     * OpenGL params
-     */
     private float[] mOrientationM = new float[16];
+
+    private List<FilterItem> testFilters;
+
 
     public CameraRenderView(Context context) {
         super(context);
@@ -66,13 +68,11 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         setPreserveEGLContextOnPause(true);
         setEGLContextClientVersion(2);
         setRenderer(this);
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
     public synchronized void onFrameAvailable(SurfaceTexture surfaceTexture) {
         updateTexture = true;
-        requestRender();
     }
 
     @Override
@@ -82,6 +82,9 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public synchronized void onSurfaceChanged(GL10 gl, int width, int height) {
+        // force set the surface size
+//        width = 1080;
+//        height = 1440;
         mWidth = width;
         mHeight = height;
 
@@ -168,19 +171,44 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         if (updateTexture) {
             mSurfaceTexture.updateTexImage();
             updateTexture = false;
+        }
 
-            polarrRender.updateInputTexture();
+//        long startTime = System.currentTimeMillis();
+
+        if (testFilters != null) {
+            polarrRender.fastUpdateInput();
+
+            int maxSize = Math.min(GRID_SIZE * GRID_SIZE, testFilters.size());
+            for (int i = 0; i < maxSize; i++) {
+                polarrRender.fastUpdateStates(testFilters.get(i).state);
+                polarrRender.fastDrawFrame();
+
+                GLES20.glViewport(mWidth / GRID_SIZE * (i % GRID_SIZE), mHeight / GRID_SIZE * (i / GRID_SIZE), mWidth / GRID_SIZE, mHeight / GRID_SIZE);
+                // demo draw screen
+                Basic filter = Basic.getInstance(getResources());
+                filter.setInputTextureId(mOutputTexture);
+                filter.setNeedClear(false);
+                // update the matrix for camera orientation
+                Matrix.setIdentityM(filter.getMatrix(), 0);
+                Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+                filter.draw();
+            }
+//                Log.d("RENDER_TIME", totalRenerTime + "ms");
+        } else {
+            polarrRender.fastUpdateInput();
             polarrRender.drawFrame();
-
             GLES20.glViewport(0, 0, mWidth, mHeight);
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
             filter.setInputTextureId(mOutputTexture);
+            filter.setNeedClear(false);
             // update the matrix for camera orientation
             Matrix.setIdentityM(filter.getMatrix(), 0);
             Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
             filter.draw();
         }
+
+//        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public void onDestroy() {
@@ -202,7 +230,20 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         queueEvent(new Runnable() {
             @Override
             public void run() {
+                testFilters = null;
+                resize(mWidth, mHeight);
                 polarrRender.updateStates(state);
+            }
+        });
+    }
+
+    public void setTestFilters(final List<FilterItem> filterItems) {
+        // sync render thread
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                testFilters = filterItems;
+                resize(GRID_WIDTH, GRID_HEIGHT);
             }
         });
     }
@@ -219,14 +260,24 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         });
     }
 
+    private void resize(int width, int height) {
+        polarrRender.updateSize(width, height);
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mOutputTexture);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, width, height,
+                0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, null);
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+    }
+
     private int genOutputTexture() {
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
 
         int texture = textures[0];
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mWidth, mHeight,
-                0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, mWidth, mHeight,
+                0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, null);
 
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
