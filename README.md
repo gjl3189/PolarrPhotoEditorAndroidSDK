@@ -443,6 +443,17 @@ renderView.updateStates(localStateMap);
 // no need init the face util
 FaceUtil.ResetFaceStates(faceStates);
 ```
+### Use 3rd part face detection lib
+```java
+// Detected points with multiple faces. Each item includes 106 points.
+List<List<PointF>> facePoints = new ArrayList<>();
+int detectWidth = 720;
+int detectHeight = 960;
+  
+Map<String, Object> faces = FaceUtil.GetFaceFeaturesWithPoints(facePoints, detectWidth, detectHeight);
+  
+renderStates.putAll(faces);
+```
 ## Filter tools
 The filter raw datas are built in renderer module.
 ### Get filter list

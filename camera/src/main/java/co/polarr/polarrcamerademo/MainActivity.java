@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,7 +27,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import co.polarr.renderer.FilterPackageUtil;
 import co.polarr.renderer.entities.FilterItem;
@@ -85,8 +88,18 @@ public class MainActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int n) {
                         FilterItem filterItem = mFilters.get(n);
+                        Map<String, Object> renderStates = new HashMap<>();
+                        renderStates.putAll(filterItem.state);
 
-                        mRenderer.updateFilter(filterItem.state);
+                        // if need add 3rd part face features
+                        List<List<PointF>> facePoints = new ArrayList<>();
+                        int detectWidth = 720;
+                        int detectHeight = 960;
+                        Map<String, Object> faces = FaceUtil.GetFaceFeaturesWithPoints(facePoints, detectWidth, detectHeight);
+
+                        renderStates.putAll(faces);
+
+                        mRenderer.updateFilter(renderStates);
 
                         currentFilterName = items[n].toString();
                         btnFilters.setText(currentFilterName);
@@ -104,7 +117,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 List<FilterItem> testFilters = new ArrayList<>();
                 for (int i = 0; i < 9; i++) {
-                    testFilters.add(mFilters.get((int) (Math.random() * mFilters.size())));
+                    testFilters.add(mFilters.get(i));
                 }
                 mRenderer.setTestFilters(testFilters);
             }

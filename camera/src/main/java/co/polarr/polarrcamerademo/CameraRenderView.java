@@ -10,6 +10,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -77,7 +78,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public synchronized void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        polarrRender.initRender(getResources(), 512, 512, null);
+        polarrRender.initRender(getResources(), 512, 512, true);
     }
 
     @Override
@@ -173,15 +174,15 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             updateTexture = false;
         }
 
-//        long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
         if (testFilters != null) {
-            polarrRender.fastUpdateInput();
+            polarrRender.updateInputTexture();
 
             int maxSize = Math.min(GRID_SIZE * GRID_SIZE, testFilters.size());
             for (int i = 0; i < maxSize; i++) {
-                polarrRender.fastUpdateStates(testFilters.get(i).state);
-                polarrRender.fastDrawFrame();
+                polarrRender.updateStates(testFilters.get(i).state);
+                polarrRender.drawFrame();
 
                 GLES20.glViewport(mWidth / GRID_SIZE * (i % GRID_SIZE), mHeight / GRID_SIZE * (i / GRID_SIZE), mWidth / GRID_SIZE, mHeight / GRID_SIZE);
                 // demo draw screen
@@ -193,9 +194,8 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
                 Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
                 filter.draw();
             }
-//                Log.d("RENDER_TIME", totalRenerTime + "ms");
         } else {
-            polarrRender.fastUpdateInput();
+            polarrRender.updateInputTexture();
             polarrRender.drawFrame();
             GLES20.glViewport(0, 0, mWidth, mHeight);
             // demo draw screen
@@ -208,7 +208,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             filter.draw();
         }
 
-//        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
+        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public void onDestroy() {

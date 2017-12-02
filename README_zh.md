@@ -453,6 +453,18 @@ renderView.updateStates(localStateMap);
 // 不需要初始化识别工具
 FaceUtil.ResetFaceStates(faceStates);
 ```
+### 使用第三方人脸识别库进行人脸识别
+```java
+// 人脸数据，支持多张人脸，每张人脸数据的点个数必须为106个
+List<List<PointF>> facePoints = new ArrayList<>();
+// 进行识别时的输入尺寸
+int detectWidth = 720;
+int detectHeight = 960;
+  
+Map<String, Object> faces = FaceUtil.GetFaceFeaturesWithPoints(facePoints, detectWidth, detectHeight);
+  
+renderStates.putAll(faces);
+```
 ## 滤镜工具
 SDK 内置了泼辣修图的滤镜包，滤镜包数据内置于renderer module中。
 ### 获取滤镜列表
