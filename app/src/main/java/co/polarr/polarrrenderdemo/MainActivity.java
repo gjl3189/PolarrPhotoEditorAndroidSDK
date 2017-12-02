@@ -13,6 +13,7 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ import java.util.Map;
 
 import co.polarr.qrcode.QRUtils;
 import co.polarr.renderer.FilterPackageUtil;
+import co.polarr.renderer.PolarrRenderThread;
+import co.polarr.renderer.RenderCallback;
 import co.polarr.renderer.entities.Adjustment;
 import co.polarr.renderer.entities.BrushItem;
 import co.polarr.renderer.entities.FilterItem;
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private FilterItem mCurrentFilter;
 
     private List<FilterItem> mFilters;
+    private PolarrRenderThread polarrRenderThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
 
         labelTv = (TextView) findViewById(R.id.label_tv);
         seekbar = (AppCompatSeekBar) findViewById(R.id.seekbar);
+
+        polarrRenderThread = new PolarrRenderThread(getResources());
+        polarrRenderThread.start();
     }
 
     @Override
@@ -99,6 +106,36 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.navigation_import_qr:
                 importQrImage();
+                break;
+            case R.id.navigation_bitmap:
+                final ImageView demoIV = (ImageView) findViewById(R.id.demo_iv);
+                demoIV.setImageBitmap(null);
+
+                if (mFilters == null) {
+                    List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
+                    mFilters = new ArrayList<>();
+                    for (FilterPackage filterPackage : packages) {
+                        mFilters.addAll(filterPackage.filters);
+                    }
+                }
+
+                final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
+
+                Map<String, Object> randomFilterStates = mFilters.get((int) (Math.random() * mFilters.size())).state;
+                polarrRenderThread.renderBitmap(imageBm, randomFilterStates, new RenderCallback() {
+                    @Override
+                    public void onRenderBitmap(final Bitmap bitmap) {
+                        imageBm.recycle();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                demoIV.setImageBitmap(bitmap);
+                            }
+                        });
+                    }
+                });
+
                 break;
         }
 
@@ -215,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        polarrRenderThread.interrupt();
         renderView.releaseRender();
         super.onDestroy();
     }

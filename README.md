@@ -43,7 +43,8 @@ PolarrRender polarrRender = new PolarrRender();
 @Override
 public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     // call in gl thread
-    polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+    boolean fastMode = false; // true for camera app
+    polarrRender.initRender(getResources(), getWidth(), getHeight(), fastMode);
 }
 ```
 ## Create or Set an input texture
@@ -112,26 +113,26 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
-## Optimized for real-time preview
-### Fast update input texture
-Replace *polarrRender.updateInputTexture();*
+## Quickly apply effects to a bitmap
+### Start a polarr render thread
 ```java
-polarrRender.fastUpdateInput();
+PolarrRenderThread polarrRenderThread = new PolarrRenderThread(getResources());
+polarrRenderThread.start();
 ```
-### Fast apply a polarr filter
-A polarr filter is required, check [Get filter list](#get-filter-list)
-
-Replace *polarrRender.updateStates(stateMap);*
+### Render a bitmap
 ```java
-FilterItem polarrFilter;
-polarrRender.fastUpdateStates(polarrFilter.state);
+Bitmap inputImage;
+Map<String, Object> renderStates;
+  
+polarrRenderThread.renderBitmap(inputImage, renderStates, new RenderCallback() {
+    @Override
+    public void onRenderBitmap(final Bitmap outputImage) {
+    }
+});
 ```
-### Fast draw
-Only for the thumbnail preview. It might loss some details
-
-Replace *polarrRender.drawFrame();*
+### Interrupt the render thread with resource released
 ```java
-polarrRender.fastDrawFrame();
+polarrRenderThread.interrupt();
 ```
 ## Auto enhance
 ### Global auto enhance

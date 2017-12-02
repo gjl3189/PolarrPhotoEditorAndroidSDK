@@ -59,7 +59,7 @@ public class DemoView extends GLSurfaceView {
             BenchmarkUtil.MemStart("initRender");
             BenchmarkUtil.MemStart("AllSDK");
             BenchmarkUtil.TimeStart("initRender");
-            polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+            polarrRender.initRender(getResources(), getWidth(), getHeight(), false);
             BenchmarkUtil.TimeEnd("initRender");
             BenchmarkUtil.MemEnd("initRender");
             polarrRender.setInputTexture(inputTexture);

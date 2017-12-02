@@ -47,7 +47,8 @@ PolarrRender polarrRender = new PolarrRender();
 @Override
 public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     // call in gl thread
-    polarrRender.initRender(getResources(), getWidth(), getHeight(), null);
+    boolean fastMode = false; // true 为视频应用优化
+    polarrRender.initRender(getResources(), getWidth(), getHeight(), fastMode);
 }
 ```
 ## 创建或传入Texture
@@ -115,26 +116,26 @@ public void onDrawFrame(GL10 gl) {
     polarrRender.drawFrame();
 }
 ```
-## 为视频应用优化的接口
-### 快速更新输入Texture
-替换 *polarrRender.updateInputTexture();*
+## 快速渲染Bitmap
+### 初始化Polarr渲染线程
 ```java
-polarrRender.fastUpdateInput();
+PolarrRenderThread polarrRenderThread = new PolarrRenderThread(getResources());
+polarrRenderThread.start();
 ```
-### 快速应用Polarr滤镜
-必须传入一个Polarr滤镜, 滤镜获取方式参考 [获取滤镜列表](#获取滤镜列表)
-
-替换 *polarrRender.updateStates(stateMap);*
+### 渲染Bitmap
 ```java
-FilterItem polarrFilter;
-polarrRender.fastUpdateStates(polarrFilter.state);
+Bitmap inputImage;
+Map<String, Object> renderStates;
+  
+polarrRenderThread.renderBitmap(inputImage, renderStates, new RenderCallback() {
+    @Override
+    public void onRenderBitmap(final Bitmap outputImage) {
+    }
+});
 ```
-### 快速渲染
-会损失一些滤镜细节，只在小尺寸预览时使用
-
-替换 *polarrRender.drawFrame();*
+### 结束渲染线程释放资源
 ```java
-polarrRender.fastDrawFrame();
+polarrRenderThread.interrupt();
 ```
 ## 自动增强
 ### 全局自动增强
