@@ -2,11 +2,13 @@ package co.polarr.polarrrenderdemo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.util.AttributeSet;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -17,12 +19,12 @@ import co.polarr.renderer.filters.Basic;
 
 /**
  * Created by Colin on 2017/10/17.
+ * demo view
  */
 
 public class DemoView extends GLSurfaceView {
     private static final String TAG = "DEBUG";
     private PolarrRender polarrRender;
-    private DemoRender render = new DemoRender();
     private int inputTexture;
 
     // benchmark
@@ -32,19 +34,19 @@ public class DemoView extends GLSurfaceView {
         super(context, attrs);
 
         setEGLContextClientVersion(3);
+        DemoRender render = new DemoRender();
         setRenderer(render);
 
         polarrRender = new PolarrRender();
     }
 
-    public void renderMagicEraser(final Bitmap mask) {
+    public void renderMagicEraser(final int inputWidth, final int inputHeight, final List<PointF> maskPoints) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("magicEraser");
-                polarrRender.magicEraser(mask);
+                polarrRender.magicEraser(inputWidth, inputHeight, maskPoints);
                 BenchmarkUtil.TimeEnd("magicEraser");
-                mask.recycle();
 
                 requestRender();
             }

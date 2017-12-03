@@ -326,14 +326,17 @@ localStateMap.put("local_adjustments", localMasks);
 renderView.updateStates(localStateMap);
 ```
 ## Magic eraser
-The requestments of eraser area：
-1. Same size as original image
-2. Black background, RGB (#000000)
-3. White eraser area, RGB (#FFFFFF)
 ```java
-// eraser area
-Bitmap mask = BitmapFactory.decodeResource(getResources(), maskRid);
-polarrRender.magicEarser(mask);
+// mask points (0, 1)
+List<PointF> maskPoints = new ArrayList<>();
+maskPoints.add(new PointF(.39f, .30f));
+maskPoints.add(new PointF(.40f, .33f));
+maskPoints.add(new PointF(.41f, .36f));
+  
+int inputWidth; // src image width;
+int inputHeight; // src image height;
+  
+polarrRender.magicEraser(inputWidth, inputHeight, maskPoints);
 ```
 ## Reset all state
 Reset image to original.

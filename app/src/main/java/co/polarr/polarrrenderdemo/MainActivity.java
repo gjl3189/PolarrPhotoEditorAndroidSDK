@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
+                final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.person);
 
                 Map<String, Object> randomFilterStates = mFilters.get((int) (Math.random() * mFilters.size())).state;
                 polarrRenderThread.renderBitmap(imageBm, randomFilterStates, new RenderCallback() {
@@ -213,39 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 showFilters();
                 break;
             case R.id.btn_eraser:
-
-                AlertDialog.Builder adb = new AlertDialog.Builder(this);
-                final CharSequence items[] = {
-                        "tatoo",
-                        "animal",
-                        "bird",
-                        "rocks",
-                };
-                adb.setItems(items, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int n) {
-                        switch (n) {
-                            case 0:
-                                setEraser(R.mipmap.a1, R.mipmap.a2);
-                                break;
-                            case 1:
-                                setEraser(R.mipmap.b1, R.mipmap.b2);
-                                break;
-                            case 2:
-                                setEraser(R.mipmap.c1, R.mipmap.c2);
-                                break;
-                            case 3:
-                                setEraser(R.mipmap.rocks_small, R.mipmap.rocks_small_mask);
-                                break;
-                        }
-                    }
-
-                });
-                adb.setNegativeButton("Cancel", null);
-                adb.setTitle("Choose a demo photo:");
-                adb.show();
-
+                setEraser(R.mipmap.person);
                 break;
         }
     }
@@ -377,10 +347,12 @@ public class MainActivity extends AppCompatActivity {
         renderView.releaseRender();
     }
 
-    private void setEraser(final int srcRid, final int maskRid) {
+    private void setEraser(final int srcRid) {
         final BitmapFactory.Options option = new BitmapFactory.Options();
         option.inScaled = false;
         Bitmap imageBm = BitmapFactory.decodeResource(getResources(), srcRid, option);
+        final int inputWidth = imageBm.getWidth();
+        final int inputHeight = imageBm.getHeight();
         renderView.importImage(imageBm);
         renderView.setAlpha(1);
 
@@ -388,9 +360,12 @@ public class MainActivity extends AppCompatActivity {
         renderView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Bitmap mask = BitmapFactory.decodeResource(getResources(), maskRid, option);
+                List<PointF> maskPoints = new ArrayList<>();
+                maskPoints.add(new PointF(.39f, .30f));
+                maskPoints.add(new PointF(.40f, .33f));
+                maskPoints.add(new PointF(.41f, .36f));
 
-                renderView.renderMagicEraser(mask);
+                renderView.renderMagicEraser(inputWidth, inputHeight, maskPoints);
             }
         }, 2000);
     }
