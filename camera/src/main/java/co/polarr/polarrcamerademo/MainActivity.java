@@ -116,9 +116,17 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 List<FilterItem> testFilters = new ArrayList<>();
-                for (int i = 0; i < 9; i++) {
-                    testFilters.add(mFilters.get(i));
+                if (mFilters.size() < 9) {
+                    testFilters.addAll(mFilters);
+                } else {
+                    while (testFilters.size() < 9) {
+                        FilterItem randomFilter = mFilters.get((int) (Math.random() * mFilters.size()));
+                        if (!testFilters.contains(randomFilter)) {
+                            testFilters.add(randomFilter);
+                        }
+                    }
                 }
+
                 mRenderer.setTestFilters(testFilters);
             }
         });

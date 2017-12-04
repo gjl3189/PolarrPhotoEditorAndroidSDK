@@ -208,7 +208,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             filter.draw();
         }
 
-        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
+//        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public void onDestroy() {
