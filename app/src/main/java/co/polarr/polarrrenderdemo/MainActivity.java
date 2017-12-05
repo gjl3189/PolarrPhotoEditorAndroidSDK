@@ -112,16 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 final ImageView demoIV = (ImageView) findViewById(R.id.demo_iv);
                 demoIV.setImageBitmap(null);
 
-                if (mFilters == null) {
-                    List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
-                    mFilters = new ArrayList<>();
-                    for (FilterPackage filterPackage : packages) {
-                        mFilters.addAll(filterPackage.filters);
-                    }
-                }
+                checkInitFilters();
 
                 final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.person);
-
                 Map<String, Object> randomFilterStates = mFilters.get((int) (Math.random() * mFilters.size())).state;
                 polarrRenderThread.renderBitmap(imageBm, randomFilterStates, new RenderCallback() {
                     @Override
@@ -516,18 +509,26 @@ public class MainActivity extends AppCompatActivity {
         renderView.updateStates(localStateMap);
     }
 
-    private void showFilters() {
+    private void checkInitFilters() {
         if (mFilters == null) {
             List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
             mFilters = new ArrayList<>();
             for (FilterPackage filterPackage : packages) {
+                for (FilterItem filterItem : filterPackage.filters) {
+                    // easy to show in demo
+                    filterItem.name = filterPackage.packageName("zh") + "_" + filterItem.filterName("zh");
+                }
                 mFilters.addAll(filterPackage.filters);
             }
         }
+    }
+
+    private void showFilters() {
+        checkInitFilters();
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         final CharSequence items[] = new CharSequence[mFilters.size()];
         for (int i = 0; i < mFilters.size(); i++) {
-            items[i] = mFilters.get(i).filterName("zh");
+            items[i] = mFilters.get(i).name.toString();
         }
         adb.setItems(items, new DialogInterface.OnClickListener() {
 
@@ -543,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
 
                 renderView.updateStates(filterItem.state);
 
-                final String label = "Filter:" + filterItem.filterName("zh");
+                final String label = "Filter:" + filterItem.name;
                 labelTv.setText(label);
                 seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
