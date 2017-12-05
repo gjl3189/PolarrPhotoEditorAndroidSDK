@@ -40,12 +40,12 @@ public class DemoView extends GLSurfaceView {
         polarrRender = new PolarrRender();
     }
 
-    public void renderMagicEraser(final int inputWidth, final int inputHeight, final List<PointF> maskPoints) {
+    public void renderMagicEraser(final List<PointF> maskPoints, final float radius) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("magicEraser");
-                polarrRender.magicEraser(inputWidth, inputHeight, maskPoints);
+                polarrRender.magicEraser(maskPoints, radius);
                 BenchmarkUtil.TimeEnd("magicEraser");
 
                 requestRender();
@@ -139,7 +139,7 @@ public class DemoView extends GLSurfaceView {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("autoEnhanceGlobal");
-                Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+                Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(1f);
                 BenchmarkUtil.TimeEnd("autoEnhanceGlobal");
 
                 if (statesMapToUpdate != null) {

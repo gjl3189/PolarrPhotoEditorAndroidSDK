@@ -142,7 +142,8 @@ polarrRenderThread.interrupt();
 返回值为全局自动增强后需要改变的调整值
 ```java
 // call in gl thread
-Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+float percent; // 增强的百分比 (0,1)
+Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(percent);
 ```
 ### 面部自动增强
 进行面部自动增强前需要先[进行人脸识别](##人脸识别)
@@ -342,10 +343,9 @@ maskPoints.add(new PointF(.39f, .30f));
 maskPoints.add(new PointF(.40f, .33f));
 maskPoints.add(new PointF(.41f, .36f));
   
-int inputWidth; // src image width;
-int inputHeight; // src image height;
+float radius; // 点半径坐标，单位为像素
   
-polarrRender.magicEraser(inputWidth, inputHeight, maskPoints);
+polarrRender.magicEraser(maskPoints, radius);
 ```
 ## 重置图片
 重置图片为原始状态

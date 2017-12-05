@@ -139,7 +139,8 @@ polarrRenderThread.interrupt();
 return the changed adjustments
 ```java
 // call in gl thread
-Map<String, Float> changedStates = polarrRender.autoEnhanceGlobal();
+float percent; // (0,1)
+Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(percent);
 ```
 ### Face auto enhance
 Need do face detection first, [Face Detection](##Face Detection)
@@ -333,10 +334,9 @@ maskPoints.add(new PointF(.39f, .30f));
 maskPoints.add(new PointF(.40f, .33f));
 maskPoints.add(new PointF(.41f, .36f));
   
-int inputWidth; // src image width;
-int inputHeight; // src image height;
+float radius; // point radius in pixel
   
-polarrRender.magicEraser(inputWidth, inputHeight, maskPoints);
+polarrRender.magicEraser(maskPoints, radius);
 ```
 ## Reset all state
 Reset image to original.
