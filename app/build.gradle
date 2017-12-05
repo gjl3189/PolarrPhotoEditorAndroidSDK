@@ -7,8 +7,8 @@ android {
         applicationId "co.polarr.polarrrenderdemo"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 10
-        versionName "0.10"
+        versionCode 11
+        versionName "0.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
