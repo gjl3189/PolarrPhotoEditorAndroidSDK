@@ -15,16 +15,17 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import co.polarr.renderer.PolarrRender;
+import co.polarr.renderer.entities.BrushItem;
 import co.polarr.renderer.filters.Basic;
 
 /**
  * Created by Colin on 2017/10/17.
- * demo view
  */
 
 public class DemoView extends GLSurfaceView {
     private static final String TAG = "DEBUG";
     private PolarrRender polarrRender;
+    private DemoRender render = new DemoRender();
     private int inputTexture;
 
     // benchmark
@@ -34,21 +35,38 @@ public class DemoView extends GLSurfaceView {
         super(context, attrs);
 
         setEGLContextClientVersion(3);
-        DemoRender render = new DemoRender();
         setRenderer(render);
 
         polarrRender = new PolarrRender();
     }
 
-    public void renderMagicEraser(final List<PointF> maskPoints, final float radius) {
+    public void renderMagicEraser(final List<PointF> maskPoints, final float pointRadius) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("magicEraser");
-                polarrRender.magicEraser(maskPoints, radius);
+                polarrRender.magicEraser(maskPoints, pointRadius);
                 BenchmarkUtil.TimeEnd("magicEraser");
 
                 requestRender();
+            }
+        });
+    }
+
+    public void updateBrushPoints(final BrushItem brushItem) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.updateBrushPoints(brushItem);
+            }
+        });
+    }
+
+    public void addBrushPathPoint(final BrushItem brushItem, final PointF point) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.addBrushPathPoint(brushItem, point);
             }
         });
     }
@@ -139,7 +157,7 @@ public class DemoView extends GLSurfaceView {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("autoEnhanceGlobal");
-                Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(1f);
+                Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(1.0f);
                 BenchmarkUtil.TimeEnd("autoEnhanceGlobal");
 
                 if (statesMapToUpdate != null) {

@@ -279,12 +279,14 @@ brushItem.channel = new float[]{1f, 0f, 0f, 0f}; // 笔刷的色彩通道，需�
 brushItem.flow = 0.5f; // 笔刷流量 (0, +1f)
 brushItem.hardness = 0.5f; // 笔刷硬度 (0, +1f)
 brushItem.size = 0.5f; // 笔刷大小 (0, +1f)
-// 笔刷由多个点组成，每个点由3个浮点数组成，{x坐标，y坐标，笔刷压感}
-Float[] points = {
-        0.097f, 0.68f, 0.5f, 0.1045f, 0.6665f, 0.5f, 0.1125f, 0.653f, 0.5f, 
-};
-brushItem.points = Arrays.asList(points); // point: {x, y, z} (0, +1f), 'z' means pressure
- 
+brushItem.spacing = 0.5f; // 关键点，点间距 (0, +1f)
+
+// 笔刷的点坐标数组，需要归一化为(0,1)
+List<PointF> touchPoints;
+brushItem.touchPoints.addAll(touchPoints);
+// 刷新笔刷的点。此方法不会绘制
+polarrRender.updateBrushPoints(brushItem);
+
 brushMask.channel = new float[]{1f, 0f, 0f, 0f}; // 蒙版的色彩通道，和笔刷的色彩通道保持一致 rgba
 brushMask.invert = false; // 反转
  
@@ -309,14 +311,23 @@ brushMask.brush.add(brushItem);
 
 brushItem.flow = 0.8f; // 笔刷流量 (0, +1f)
 brushItem.size = 0.5f; // 笔刷大小 (0, +1f)
+brushItem.spacing = 0.5f; // 关键点，点间距 (0, +1f)
+brushItem.hardness = 1f; // 笔刷硬度 (0, +1f)
+brushItem.interpolate = false; // 是否需要连续
+brushItem.randomize = 0.25f; // 随机化笔触 (0, +1f)
 brushItem.mode = "paint"; // 蒙版笔刷 mask, 贴图笔刷 paint
-brushItem.texture = "stroke_1"; // 笔刷贴图 "stroke_1","stroke_2","stroke_3","stroke_4","dot","speckles","chalk"
-
-// 笔刷由多个点组成，每个点由4个浮点数组成，{x坐标，y坐标，笔刷压感，方向}，其中'方向'的取值范围为(-π，+π)
-Float[] points = {
-        0.189f, 0.8005f, 0.5f, 2.255f, 0.181f, 0.793f, 0.5f, 2.255f, 0.1725f, 0.7855f, 0.5f, 2.255f, 
-};
-brushItem.points = Arrays.asList(points); // point: {x, y, p, d} (0, +1f), 'p' means pressure, 'd' means direction (-π，+π)
+brushItem.texture = "stroke_1"; // 笔刷贴图 "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
+  
+// 笔刷的点坐标数组，需要归一化为(0,1)
+List<PointF> touchPoints;
+brushItem.touchPoints.addAll(touchPoints);
+  
+// 刷新笔刷的点。此方法不会绘制。需要在render线程调用
+polarrRender.updateBrushPoints(brushItem);
+  
+// 增加点，请调用此方法。此方法不会绘制。
+PointF point;
+polarrRender.addBrushPathPoint(brushItem, point);
  
 brushMask.disabled = false; // 是否禁用，禁用后将不应用该蒙版
  

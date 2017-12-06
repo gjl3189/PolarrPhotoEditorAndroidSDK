@@ -271,11 +271,13 @@ brushItem.channel = new float[]{1f, 0f, 0f, 0f}; // rgba same as brushMask.chann
 brushItem.flow = 0.5f; // (0, +1f)
 brushItem.hardness = 0.5f; // (0, +1f)
 brushItem.size = 0.5f; // (0, +1f)
-// 3 values for each point
-Float[] points = {
-        0.097f, 0.68f, 0.5f, 0.1045f, 0.6665f, 0.5f, 
-};
-brushItem.points = Arrays.asList(points); // point: {x, y, z} (0, +1f), 'z' means pressure
+brushItem.spacing = 0.5f; // key points spacing (0, +1f)
+  
+List<PointF> touchPoints; // (0,1)
+brushItem.touchPoints.addAll(touchPoints);
+  
+// update the real points. won't render texture. need call in render thread
+polarrRender.updateBrushPoints(brushItem);
  
 brushMask.channel = new float[]{1f, 0f, 0f, 0f}; //rgba same as brushItem.channel
 brushMask.invert = false;
@@ -301,14 +303,24 @@ brushMask.brush.add(brushItem);
 
 brushItem.flow = 0.8f; // (0, +1f)
 brushItem.size = 0.5f; // (0, +1f)
+brushItem.spacing = 0.5f; // key points spacing (0, +1f)
+brushItem.hardness = 1f; // (0, +1f)
+brushItem.interpolate = false;
+brushItem.randomize = 0.25f; // (0, +1f)
+
 brushItem.mode = "paint"; // mask, paint
-brushItem.texture = "stroke_1"; // "stroke_1","stroke_2","stroke_3","stroke_4","dot","speckles","chalk"
-// 4 values for each point
-Float[] points = {
-        0.189f, 0.8005f, 0.5f, 2.255f, 0.181f, 0.793f, 0.5f, 2.255f, 0.1725f, 0.7855f, 0.5f, 2.255f, 
-};
-brushItem.points = Arrays.asList(points); // point: {x, y, p, d} (0, +1f), 'p' means pressure, 'd' means direction (-π，+π)
- 
+brushItem.texture = "stroke_1"; // "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
+  
+List<PointF> touchPoints; // (0,1)
+brushItem.touchPoints.addAll(touchPoints);
+  
+// update the real points. won't render texture. need call in render thread
+polarrRender.updateBrushPoints(brushItem);
+  
+// add a new point. won't render texture. need call in render thread
+PointF point;
+polarrRender.addBrushPathPoint(brushItem, point);
+  
 brushMask.disabled = false;
  
 // Need set the colorful adjustments
