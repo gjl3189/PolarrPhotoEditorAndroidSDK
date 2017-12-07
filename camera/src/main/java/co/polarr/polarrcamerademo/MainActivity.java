@@ -71,6 +71,9 @@ public class MainActivity extends Activity {
         List<FilterPackage> packages = FilterPackageUtil.GetAllFilters(getResources());
         mFilters = new ArrayList<>();
         for (FilterPackage filterPackage : packages) {
+            for (FilterItem filterItem : filterPackage.filters) {
+                filterItem.name = filterPackage.packageName("zh") + "." + filterItem.filterName("zh");
+            }
             mFilters.addAll(filterPackage.filters);
         }
 
@@ -81,7 +84,7 @@ public class MainActivity extends Activity {
                 AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this, R.style.MyDialogTheme);
                 final CharSequence items[] = new CharSequence[mFilters.size()];
                 for (int i = 0; i < mFilters.size(); i++) {
-                    items[i] = mFilters.get(i).filterName("zh");
+                    items[i] = mFilters.get(i).name.toString();
                 }
                 adb.setItems(items, new DialogInterface.OnClickListener() {
 

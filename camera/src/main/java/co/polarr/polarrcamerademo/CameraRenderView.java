@@ -174,8 +174,6 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             updateTexture = false;
         }
 
-        long startTime = System.currentTimeMillis();
-
         if (testFilters != null) {
             polarrRender.updateInputTexture();
 
@@ -196,7 +194,9 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             }
         } else {
             polarrRender.updateInputTexture();
+//            long startTime = System.currentTimeMillis();
             polarrRender.drawFrame();
+//            Log.d("RENDER_TIME", (System.currentTimeMillis() - startTime) + "ms");
             GLES20.glViewport(0, 0, mWidth, mHeight);
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
@@ -207,8 +207,6 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
             filter.draw();
         }
-
-//        Log.d("During", (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public void onDestroy() {
