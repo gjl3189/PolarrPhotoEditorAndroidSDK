@@ -36,6 +36,7 @@ public class DemoView extends GLSurfaceView {
 
         setEGLContextClientVersion(3);
         setRenderer(render);
+//        setRenderMode(RENDERMODE_WHEN_DIRTY);
 
         polarrRender = new PolarrRender();
     }
@@ -47,28 +48,17 @@ public class DemoView extends GLSurfaceView {
                 BenchmarkUtil.TimeStart("magicEraser");
                 polarrRender.magicEraser(maskPoints, pointRadius);
                 BenchmarkUtil.TimeEnd("magicEraser");
-
-                requestRender();
             }
         });
     }
 
     public void updateBrushPoints(final BrushItem brushItem) {
-        queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                polarrRender.updateBrushPoints(brushItem);
-            }
-        });
+        polarrRender.updateBrushPoints(brushItem);
+
     }
 
     public void addBrushPathPoint(final BrushItem brushItem, final PointF point) {
-        queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                polarrRender.addBrushPathPoint(brushItem, point);
-            }
-        });
+        polarrRender.addBrushPathPoint(brushItem, point);
     }
 
     private class DemoRender implements Renderer {
@@ -177,8 +167,6 @@ public class DemoView extends GLSurfaceView {
                 polarrRender.autoEnhanceFace(faceStates, 0);
                 BenchmarkUtil.TimeEnd("autoEnhanceFace");
                 polarrRender.updateStates(faceStates);
-
-                requestRender();
             }
         });
     }

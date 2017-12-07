@@ -276,7 +276,7 @@ brushItem.spacing = 0.5f; // key points spacing (0, +1f)
 List<PointF> touchPoints; // (0,1)
 brushItem.touchPoints.addAll(touchPoints);
   
-// update the real points. won't render texture. need call in render thread
+// update the real points. won't render texture.
 polarrRender.updateBrushPoints(brushItem);
  
 brushMask.channel = new float[]{1f, 0f, 0f, 0f}; //rgba same as brushItem.channel
@@ -314,10 +314,10 @@ brushItem.texture = "stroke_1"; // "stroke_1","stroke_2","stroke_3","stroke_4","
 List<PointF> touchPoints; // (0,1)
 brushItem.touchPoints.addAll(touchPoints);
   
-// update the real points. won't render texture. need call in render thread
+// update the real points. won't render texture.
 polarrRender.updateBrushPoints(brushItem);
   
-// add a new point. won't render texture. need call in render thread
+// add a new point. won't render texture.
 PointF point;
 polarrRender.addBrushPathPoint(brushItem, point);
   

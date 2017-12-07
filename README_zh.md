@@ -322,7 +322,7 @@ brushItem.texture = "stroke_1"; // 笔刷贴图 "stroke_1","stroke_2","stroke_3"
 List<PointF> touchPoints;
 brushItem.touchPoints.addAll(touchPoints);
   
-// 刷新笔刷的点。此方法不会绘制。需要在render线程调用
+// 刷新笔刷的点。此方法不会绘制。
 polarrRender.updateBrushPoints(brushItem);
   
 // 增加点，请调用此方法。此方法不会绘制。

@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int POINT_BRUSH_MOSIC = 1;
     private static final int POINT_BRUSH_BLUR = 2;
     private static final int POINT_BRUSH_PAINT = 3;
+
+    private static final int TOUCH_FPS = 30;
     private String brushType;
     private int currentPointState;
     private List<PointF> currentPoints;
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<FilterItem> mFilters;
     private PolarrRenderThread polarrRenderThread;
+    private long lasUpdateTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,12 +198,19 @@ public class MainActivity extends AppCompatActivity {
                 if (point != null) {
                     if (paintBrushItem == null) {
                         setBrushPaint(brushType);
-                        addBrushPaintPoint(point);
-                    } else {
-                        addBrushPaintPoint(point);
                     }
+                    addBrushPaintPoint(point);
                 }
                 break;
+        }
+        lazyUpdate(TOUCH_FPS);
+    }
+
+    private void lazyUpdate(int fps) {
+        long time = System.currentTimeMillis();
+        if (time - lasUpdateTime > (1000f / fps)) {
+            renderView.updateStates(localStateMap);
+            lasUpdateTime = System.currentTimeMillis();
         }
     }
 
@@ -576,7 +586,6 @@ public class MainActivity extends AppCompatActivity {
         localMasks.add(brushMask);
         localStateMap.put("local_adjustments", localMasks);
         renderView.updateBrushPoints(brushItem);
-        renderView.updateStates(localStateMap);
     }
 
     private void setBrushPaint(String paintType) {
@@ -613,7 +622,6 @@ public class MainActivity extends AppCompatActivity {
     private void addBrushPaintPoint(PointF point) {
         if (paintBrushItem != null) {
             renderView.addBrushPathPoint(paintBrushItem, point);
-            renderView.updateStates(localStateMap);
         }
     }
 
@@ -771,7 +779,6 @@ public class MainActivity extends AppCompatActivity {
                         labelTv.setText(String.format(Locale.ENGLISH, "%s: %.2f", finalLabel, adjustmentValue));
 
                         renderView.updateStates(localStateMap);
-                        renderView.requestRender();
                     }
 
                     @Override
