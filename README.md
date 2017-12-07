@@ -483,9 +483,10 @@ FilterItem filterItem = filterPackage.filters.get(0);
 renderView.updateStates(filterItem.state);
 ```
 ### Adjustment a filter
+the best value is 0.5. Above 0.5 means enhance effects, below means reduce effects.
 ```java
 float adjustmentValue = 0.5f; // (0f, 1f)
-Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(filterItem.state, adjustmentValue);
+Map<String, Object> interpolateStates = FilterPackageUtil.GetRefStates(filterItem.state, adjustmentValue);
 ```
 ## QR code
 ### QR code request from a url

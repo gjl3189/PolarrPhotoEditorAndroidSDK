@@ -152,19 +152,19 @@ public class DemoView extends GLSurfaceView {
         });
     }
 
-    public void autoEnhance(final Map<String, Object> statesMapToUpdate) {
+    public void autoEnhance(final Map<String, Object> statesMapToUpdate, final float percent) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("autoEnhanceGlobal");
-                Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(1.0f);
+                Map<String, Object> changedStates = polarrRender.autoEnhanceGlobal(percent);
                 BenchmarkUtil.TimeEnd("autoEnhanceGlobal");
 
                 if (statesMapToUpdate != null) {
                     statesMapToUpdate.putAll(changedStates);
-                }
 
-                requestRender();
+                    updateStates(statesMapToUpdate);
+                }
             }
         });
     }

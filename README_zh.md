@@ -493,9 +493,10 @@ FilterItem filterItem = filterPackage.filters.get(0);
 renderView.updateStates(filterItem.state);
 ```
 ### 调整滤镜程度
+返回滤镜的参考调整范围。程度为50%时表示滤镜的原始数值，增加表示增强各个参数的程度，减少表示减弱各个参数的程度。
 ```java
 float adjustmentValue = 0.5f; // 滤镜程度 (0f, 1f)
-Map<String, Object> interpolateStates = FilterPackageUtil.GetInterpolateValue(filterItem.state, adjustmentValue);
+Map<String, Object> interpolateStates = FilterPackageUtil.GetRefStates(filterItem.state, adjustmentValue);
 ```
 ## 滤镜二维码
 ### 通过url请求滤镜信息
