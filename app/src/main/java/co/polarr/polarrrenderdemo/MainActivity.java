@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 importQrImage();
                 break;
             case R.id.navigation_bitmap:
+                findViewById(R.id.tv_desc).setVisibility(View.GONE);
                 final ImageView demoIV = (ImageView) findViewById(R.id.demo_iv);
                 demoIV.setImageBitmap(null);
 
@@ -360,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importImage() {
+        findViewById(R.id.tv_desc).setVisibility(View.GONE);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(intent, REQUEST_IMPORT_PHOTO);
