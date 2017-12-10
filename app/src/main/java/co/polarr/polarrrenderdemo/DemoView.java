@@ -104,6 +104,7 @@ public class DemoView extends GLSurfaceView {
             public void run() {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+                polarrRender.updateSize(bitmap.getWidth(), bitmap.getHeight());
                 polarrRender.updateInputTexture();
             }
         });

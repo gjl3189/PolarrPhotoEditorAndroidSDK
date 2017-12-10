@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
      * Render View
      */
     private DemoView renderView;
+    private RelativeLayout renderRl;
     /**
      * adjustment container
      */
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // init render view
+        renderRl = (RelativeLayout) findViewById(R.id.render_rl);
         renderView = (DemoView) findViewById(R.id.render_view);
         renderView.setAlpha(0);
 
@@ -141,19 +145,25 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.person);
-                Map<String, Object> randomFilterStates = mFilters.get((int) (Math.random() * mFilters.size())).state;
+
+                List<String> idArray = new ArrayList<>();
+                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
 
                 BenchmarkUtil.TimeStart("renderBitmap");
-                polarrRenderThread.renderBitmap(imageBm, randomFilterStates, new RenderCallback() {
+
+                polarrRenderThread.renderBitmap(imageBm, idArray, new RenderCallback() {
                     @Override
-                    public void onRenderBitmap(final Bitmap bitmap) {
+                    public void onRenderBitmap(final List<Bitmap> bitmapList) {
                         imageBm.recycle();
                         BenchmarkUtil.TimeEnd("renderBitmap");
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                demoIV.setImageBitmap(bitmap);
+                                demoIV.setImageBitmap(bitmapList.get(bitmapList.size() -1));
                             }
                         });
                     }
@@ -377,13 +387,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_IMPORT_PHOTO == requestCode) {
             if (data != null) {
-                Uri uri = data.getData();
-                final Bitmap imageBm = decodeBitmapFromUri(this, uri);
+                final Uri uri = data.getData();
                 renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri, renderRl.getWidth(), renderRl.getHeight());
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
+                        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(imageBm.getWidth(), imageBm.getHeight());
+                        rlp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                        renderView.setLayoutParams(rlp);
                     }
                 }, 1000);
             }
@@ -420,12 +433,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static Bitmap decodeBitmapFromUri(Context context, Uri uri) {
+    private static Bitmap decodeBitmapFromUri(Context context, Uri uri, int viewWidth, int viewHight) {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             Bitmap decodedBm = BitmapFactory.decodeStream(inputStream);
             Bitmap formatedBm = decodedBm.copy(Bitmap.Config.ARGB_8888, false);
             decodedBm.recycle();
+
+            int w = formatedBm.getWidth();
+            int h = formatedBm.getHeight();
+            Matrix matrix = new Matrix();
+            float scalew = (float) viewWidth / w;
+            float scaleh = (float) viewHight / h;
+            float scale = scalew < scaleh ? scalew : scaleh;
+            matrix.postScale(scale, scale);
+            Bitmap bmp = Bitmap.createBitmap(formatedBm, 0, 0, w, h, matrix, true);
+            if (formatedBm != null && !formatedBm.equals(bmp) && !formatedBm.isRecycled())
+            {
+                formatedBm.recycle();
+                formatedBm = null;
+            }
             return formatedBm;
         } catch (Exception e) {
             e.printStackTrace();
