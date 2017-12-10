@@ -122,11 +122,11 @@ polarrRenderThread.start();
 ### Render a bitmap
 ```java
 Bitmap inputImage;
-Map<String, Object> renderStates;
+List<String> filterIds; // filter id array
   
-polarrRenderThread.renderBitmap(inputImage, renderStates, new RenderCallback() {
+polarrRenderThread.renderBitmap(inputImage, filterIds, new RenderCallback() {
     @Override
-    public void onRenderBitmap(final Bitmap outputImage) {
+    public void onRenderBitmap(List<Bitmap> bitmapList) {
     }
 });
 ```

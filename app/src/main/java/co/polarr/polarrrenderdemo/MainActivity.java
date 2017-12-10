@@ -132,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
                 importQrImage();
                 break;
             case R.id.navigation_bitmap:
-                findViewById(R.id.tv_desc).setVisibility(View.GONE);
                 final ImageView demoIV = (ImageView) findViewById(R.id.demo_iv);
                 demoIV.setImageBitmap(null);
 
@@ -146,27 +145,26 @@ public class MainActivity extends AppCompatActivity {
 
                 final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.person);
 
-                List<String> idArray = new ArrayList<>();
-                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
-                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
-                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
-                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
-                idArray.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                List<String> filterIds = new ArrayList<>();
+                for (int i = 0; i < 20; i++) {
+                    filterIds.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                }
 
                 BenchmarkUtil.TimeStart("renderBitmap");
 
-                polarrRenderThread.renderBitmap(imageBm, idArray, new RenderCallback() {
+                polarrRenderThread.renderBitmap(imageBm, filterIds, new RenderCallback() {
                     @Override
-                    public void onRenderBitmap(final List<Bitmap> bitmapList) {
-                        imageBm.recycle();
+                    public void onRenderBitmap(List<Bitmap> bitmapList) {
                         BenchmarkUtil.TimeEnd("renderBitmap");
+                        imageBm.recycle();
+                        final Bitmap displayBitmap = bitmapList.get(bitmapList.size() - 1);
+                        for (int i = 0; i < bitmapList.size() - 1; i++) {
+                            bitmapList.get(i).recycle();
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                demoIV.setImageBitmap(bitmapList.get(bitmapList.size() -1));
-                                for (int i = 0; i < bitmapList.size() - 1; i++) {
-                                    bitmapList.get(i).recycle();
-                                }
+                                demoIV.setImageBitmap(displayBitmap);
                             }
                         });
                     }
@@ -347,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importImageDemo() {
-        final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1);
+        final Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1), renderRl.getWidth(), renderRl.getHeight());
 
         new Thread() {
             @Override
@@ -370,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
 
         renderView.importImage(imageBm);
         renderView.setAlpha(1);
-        findViewById(R.id.tv_desc).setVisibility(View.GONE);
+        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
     }
 
     private void importImage() {
@@ -397,9 +395,8 @@ public class MainActivity extends AppCompatActivity {
                         final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri, renderRl.getWidth(), renderRl.getHeight());
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
-                        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(imageBm.getWidth(), imageBm.getHeight());
-                        rlp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                        renderView.setLayoutParams(rlp);
+
+                        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
                     }
                 }, 1000);
             }
@@ -436,6 +433,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateRenderLayout(int width, int height) {
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) renderView.getLayoutParams();
+        rlp.width = width;
+        rlp.height = height;
+        renderView.setLayoutParams(rlp);
+    }
+
     private static Bitmap decodeBitmapFromUri(Context context, Uri uri, int viewWidth, int viewHight) {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
@@ -443,24 +447,27 @@ public class MainActivity extends AppCompatActivity {
             Bitmap formatedBm = decodedBm.copy(Bitmap.Config.ARGB_8888, false);
             decodedBm.recycle();
 
-            int w = formatedBm.getWidth();
-            int h = formatedBm.getHeight();
-            Matrix matrix = new Matrix();
-            float scalew = (float) viewWidth / w;
-            float scaleh = (float) viewHight / h;
-            float scale = scalew < scaleh ? scalew : scaleh;
-            matrix.postScale(scale, scale);
-            Bitmap bmp = Bitmap.createBitmap(formatedBm, 0, 0, w, h, matrix, true);
-            if (formatedBm != null && !formatedBm.equals(bmp) && !formatedBm.isRecycled())
-            {
-                formatedBm.recycle();
-                formatedBm = null;
-            }
-            return formatedBm;
+            return scaledBitmap(formatedBm, viewWidth, viewHight);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static Bitmap scaledBitmap(Bitmap formatedBm, int width, int height) {
+        int w = formatedBm.getWidth();
+        int h = formatedBm.getHeight();
+        Matrix matrix = new Matrix();
+        float scalew = (float) width / w;
+        float scaleh = (float) height / h;
+        float scale = scalew < scaleh ? scalew : scaleh;
+        matrix.postScale(scale, scale);
+        Bitmap bmp = Bitmap.createBitmap(formatedBm, 0, 0, w, h, matrix, true);
+        if (!formatedBm.equals(bmp) && !formatedBm.isRecycled()) {
+            formatedBm.recycle();
+        }
+
+        return bmp;
     }
 
     private void showQRScan() {
@@ -489,7 +496,8 @@ public class MainActivity extends AppCompatActivity {
         final BitmapFactory.Options option = new BitmapFactory.Options();
         option.inScaled = false;
         Bitmap imageBm = BitmapFactory.decodeResource(getResources(), srcRid, option);
-        renderView.importImage(imageBm);
+
+        renderView.importImage(scaledBitmap(imageBm, renderRl.getWidth(), renderRl.getHeight()));
         renderView.setAlpha(1);
 
         Toast.makeText(this, "Start processing in 2 sec...", Toast.LENGTH_SHORT).show();
@@ -631,13 +639,31 @@ public class MainActivity extends AppCompatActivity {
         BrushItem brushItem = new BrushItem();
         brushMask.brush.add(brushItem);
 
-        brushItem.flow = 0.7f; // (0, +1f)
-        brushItem.size = 0.7f; // (0, +1f)
-        brushItem.interpolate = false;
-        brushItem.mode = "paint"; // mask, paint
-        brushItem.randomize = 0.25f;
-        brushItem.spacing = 0.5f;
-        brushItem.hardness = 1f;
+        if (paintType.equals("stroke_5")) {
+            brushItem.flow = 0.75f; // (0, +1f)
+            brushItem.size = 0.5f; // (0, +1f)
+            brushItem.interpolate = true;
+            brushItem.mode = "paint"; // mask, paint
+            brushItem.randomize = 0.5f;
+            brushItem.spacing = 0.3f;
+            brushItem.hardness = 1f;
+        } else if (paintType.equals("stroke_6")) {
+            brushItem.flow = 0.7f; // (0, +1f)
+            brushItem.size = 0.5f; // (0, +1f)
+            brushItem.interpolate = true;
+            brushItem.mode = "paint"; // mask, paint
+            brushItem.randomize = 0.0f;
+            brushItem.spacing = 0.35f;
+            brushItem.hardness = 1f;
+        } else {
+            brushItem.flow = 0.7f; // (0, +1f)
+            brushItem.size = 0.7f; // (0, +1f)
+            brushItem.interpolate = false;
+            brushItem.mode = "paint"; // mask, paint
+            brushItem.randomize = 0.25f;
+            brushItem.spacing = 0.5f;
+            brushItem.hardness = 1f;
+        }
         brushItem.texture = paintType; // "stroke_5","stroke_6"
 
         brushMask.disabled = false;
@@ -844,6 +870,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideAll() {
+        findViewById(R.id.tv_desc).setVisibility(View.GONE);
         stopBrush();
         sliderCon.setVisibility(View.INVISIBLE);
 

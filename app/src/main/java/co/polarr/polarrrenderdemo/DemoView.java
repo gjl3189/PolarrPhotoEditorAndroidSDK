@@ -6,6 +6,7 @@ import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.opengl.Matrix;
 import android.util.AttributeSet;
 
 import java.util.List;
@@ -89,6 +90,7 @@ public class DemoView extends GLSurfaceView {
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
             filter.setInputTextureId(polarrRender.getOutputId());
+            Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
             filter.draw();
 
             if (System.currentTimeMillis() - lastTraceTime > 2000) {

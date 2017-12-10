@@ -125,11 +125,11 @@ polarrRenderThread.start();
 ### 渲染Bitmap
 ```java
 Bitmap inputImage;
-Map<String, Object> renderStates;
+List<String> filterIds; // 滤镜id的数组
   
-polarrRenderThread.renderBitmap(inputImage, renderStates, new RenderCallback() {
+polarrRenderThread.renderBitmap(inputImage, filterIds, new RenderCallback() {
     @Override
-    public void onRenderBitmap(final Bitmap outputImage) {
+    public void onRenderBitmap(List<Bitmap> bitmapList) {
     }
 });
 ```
