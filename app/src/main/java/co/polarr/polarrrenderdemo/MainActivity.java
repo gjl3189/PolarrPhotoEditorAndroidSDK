@@ -164,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 demoIV.setImageBitmap(bitmapList.get(bitmapList.size() -1));
+                                for (int i = 0; i < bitmapList.size() - 1; i++) {
+                                    bitmapList.get(i).recycle();
+                                }
                             }
                         });
                     }
