@@ -75,16 +75,19 @@ public class DemoView extends GLSurfaceView {
             BenchmarkUtil.TimeEnd("initRender");
             BenchmarkUtil.MemEnd("initRender");
             polarrRender.setInputTexture(inputTexture);
+
+            outputTexture = genOutputTexture(getWidth(), getHeight());
+            polarrRender.setOutputTexture(outputTexture);
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            outputTexture = genOutputTexture(width, height);
-            polarrRender.setOutputTexture(outputTexture);
-
             BenchmarkUtil.TimeStart("updateSize");
-            polarrRender.updateSize(width, height);
+            // already updated by importImage.
+//            polarrRender.updateSize(width, height);
             BenchmarkUtil.TimeEnd("updateSize");
+
+            updateSize(outputTexture, width, height);
         }
 
         @Override
@@ -136,6 +139,12 @@ public class DemoView extends GLSurfaceView {
         GLES20.glGenTextures(1, textures, 0);
 
         int texture = textures[0];
+        updateSize(texture, width, height);
+
+        return texture;
+    }
+
+    private void updateSize(int texture, int width, int height) {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, width, height,
                 0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, null);
@@ -146,8 +155,6 @@ public class DemoView extends GLSurfaceView {
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-
-        return texture;
     }
 
     public void updateStatesWithJson(final String statesString) {
