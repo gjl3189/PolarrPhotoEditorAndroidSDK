@@ -307,6 +307,7 @@ brushItem.spacing = 0.5f; // key points spacing (0, +1f)
 brushItem.hardness = 1f; // (0, +1f)
 brushItem.interpolate = false;
 brushItem.randomize = 0.25f; // (0, +1f)
+brushItem.erase = false;
 
 brushItem.mode = "paint"; // mask, paint
 brushItem.texture = "stroke_1"; // "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"

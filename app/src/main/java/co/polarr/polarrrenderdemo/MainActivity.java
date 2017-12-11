@@ -54,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
     private String brushType;
     private int currentPointState;
     private List<PointF> currentPoints;
-    private BrushItem paintBrushItem;
 
+    private BrushItem paintBrushItem;
+    private BrushItem eraerBrushItem;
+    private int paintState = 0; // 0:idle, 1:paint, 2:eraser
 
     private AppCompatSeekBar seekbar;
     private TextView labelTv;
@@ -188,8 +190,10 @@ public class MainActivity extends AppCompatActivity {
     private void endTouch() {
         currentPoints.clear();
         if (currentPointState == POINT_BRUSH_PAINT) {
-            if (paintBrushItem != null) {
-                paintBrushItem = null;
+            if (paintState == 1) {
+                paintState = 2;
+            } else if (paintState == 2) {
+                paintState = 0;
             }
         }
     }
@@ -208,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case POINT_BRUSH_PAINT:
                 if (point != null) {
-                    if (paintBrushItem == null) {
+                    if (paintState == 0) {
                         setBrushPaint(brushType);
                     }
                     addBrushPaintPoint(point);
@@ -672,14 +676,50 @@ public class MainActivity extends AppCompatActivity {
         localMasks.add(brushMask);
         localStateMap.put("local_adjustments", localMasks);
 
-        renderView.updateStates(localStateMap);
 
+        BrushItem eraerBrush = new BrushItem();
+        brushMask.brush.add(eraerBrush);
+        if (paintType.equals("stroke_5")) {
+            eraerBrush.flow = 0.75f; // (0, +1f)
+            eraerBrush.size = 0.5f; // (0, +1f)
+            eraerBrush.interpolate = true;
+            eraerBrush.mode = "paint"; // mask, paint
+            eraerBrush.randomize = 0.5f;
+            eraerBrush.spacing = 0.3f;
+            eraerBrush.hardness = 1f;
+            eraerBrush.erase = true;
+        } else if (paintType.equals("stroke_6")) {
+            eraerBrush.flow = 0.7f; // (0, +1f)
+            eraerBrush.size = 0.5f; // (0, +1f)
+            eraerBrush.interpolate = true;
+            eraerBrush.mode = "paint"; // mask, paint
+            eraerBrush.randomize = 0.0f;
+            eraerBrush.spacing = 0.35f;
+            eraerBrush.hardness = 1f;
+            eraerBrush.erase = true;
+        } else {
+            eraerBrush.flow = 0.7f; // (0, +1f)
+            eraerBrush.size = 0.7f; // (0, +1f)
+            eraerBrush.interpolate = false;
+            eraerBrush.mode = "paint"; // mask, paint
+            eraerBrush.randomize = 0.25f;
+            eraerBrush.spacing = 0.5f;
+            eraerBrush.hardness = 1f;
+            eraerBrush.erase = true;
+        }
+
+        renderView.updateStates(localStateMap);
+        paintState = 1;
         paintBrushItem = brushItem;
+        eraerBrushItem = eraerBrush;
     }
 
     private void addBrushPaintPoint(PointF point) {
-        if (paintBrushItem != null) {
+        if (paintState == 1 && paintBrushItem != null) {
             renderView.addBrushPathPoint(paintBrushItem, point);
+        }
+        else if (paintState == 2 && eraerBrushItem != null) {
+            renderView.addBrushPathPoint(eraerBrushItem, point);
         }
     }
 

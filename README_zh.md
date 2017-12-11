@@ -315,6 +315,7 @@ brushItem.spacing = 0.5f; // 关键点，点间距 (0, +1f)
 brushItem.hardness = 1f; // 笔刷硬度 (0, +1f)
 brushItem.interpolate = false; // 是否需要连续
 brushItem.randomize = 0.25f; // 随机化笔触 (0, +1f)
+brushItem.erase = false; // 是否为橡皮
 brushItem.mode = "paint"; // 蒙版笔刷 mask, 贴图笔刷 paint
 brushItem.texture = "stroke_1"; // 笔刷贴图 "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
   
