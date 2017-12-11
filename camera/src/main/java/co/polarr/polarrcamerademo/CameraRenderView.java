@@ -3,14 +3,15 @@ package co.polarr.polarrcamerademo;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -33,6 +34,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
     private static final int GRID_SIZE = 3;
     private static final int GRID_WIDTH = 320;
     private static final int GRID_HEIGHT = 480;
+    private static final boolean DEBUG_DEMO_TEXTURE2D_INPUT = !true;
     private Context mContext;
 
     /**
@@ -96,7 +98,25 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
 
         //generate camera texture------------------------
         mCameraTexture.init();
-        polarrRender.setInputTexture(mCameraTexture.getTextureId(), PolarrRender.EXTERNAL_OES);
+        if (DEBUG_DEMO_TEXTURE2D_INPUT) {
+            int[] textures = new int[1];
+            GLES20.glGenTextures(1, textures, 0);
+            int inputTexture = textures[0];
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
+            bitmap.recycle();
+
+            polarrRender.setInputTexture(inputTexture);
+        } else {
+            polarrRender.setInputTexture(mCameraTexture.getTextureId(), PolarrRender.EXTERNAL_OES);
+        }
 
         //set up surfacetexture------------------
         SurfaceTexture oldSurfaceTexture = mSurfaceTexture;
@@ -147,7 +167,7 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         } else {
             Matrix.setRotateM(mOrientationM, 0, 0.0f, 0f, 0f, 1f);
         }
-
+        Matrix.scaleM(mOrientationM, 0, 1, -1, 1);
         param.setPictureFormat(PixelFormat.JPEG);
         param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
@@ -187,9 +207,14 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
                 Basic filter = Basic.getInstance(getResources());
                 filter.setInputTextureId(mOutputTexture);
                 filter.setNeedClear(false);
-                // update the matrix for camera orientation
-                Matrix.setIdentityM(filter.getMatrix(), 0);
-                Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+
+                if (DEBUG_DEMO_TEXTURE2D_INPUT) {
+                    Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
+                } else {
+                    // update the matrix for camera orientation
+                    Matrix.setIdentityM(filter.getMatrix(), 0);
+                    Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+                }
                 filter.draw();
             }
         } else {
@@ -202,9 +227,15 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
             Basic filter = Basic.getInstance(getResources());
             filter.setInputTextureId(mOutputTexture);
             filter.setNeedClear(false);
-            // update the matrix for camera orientation
-            Matrix.setIdentityM(filter.getMatrix(), 0);
-            Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+
+            if (DEBUG_DEMO_TEXTURE2D_INPUT) {
+                Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
+            } else {
+                // update the matrix for camera orientation
+                Matrix.setIdentityM(filter.getMatrix(), 0);
+                Matrix.multiplyMM(filter.getMatrix(), 0, filter.getMatrix(), 0, mOrientationM, 0);
+            }
+
             filter.draw();
         }
     }
