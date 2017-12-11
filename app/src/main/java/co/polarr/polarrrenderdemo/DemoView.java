@@ -28,6 +28,7 @@ public class DemoView extends GLSurfaceView {
     private PolarrRender polarrRender;
     private DemoRender render = new DemoRender();
     private int inputTexture;
+    private int outputTexture;
 
     // benchmark
     private long lastTraceTime = 0;
@@ -66,7 +67,7 @@ public class DemoView extends GLSurfaceView {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            genInputTexture();
+            inputTexture = genInputTexture();
             BenchmarkUtil.MemStart("initRender");
             BenchmarkUtil.MemStart("AllSDK");
             BenchmarkUtil.TimeStart("initRender");
@@ -78,6 +79,9 @@ public class DemoView extends GLSurfaceView {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
+            outputTexture = genOutputTexture(width, height);
+            polarrRender.setOutputTexture(outputTexture);
+
             BenchmarkUtil.TimeStart("updateSize");
             polarrRender.updateSize(width, height);
             BenchmarkUtil.TimeEnd("updateSize");
@@ -89,7 +93,7 @@ public class DemoView extends GLSurfaceView {
 
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
-            filter.setInputTextureId(polarrRender.getOutputId());
+            filter.setInputTextureId(outputTexture);
             Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
             filter.draw();
 
@@ -112,17 +116,38 @@ public class DemoView extends GLSurfaceView {
         });
     }
 
-    private void genInputTexture() {
+    private int genInputTexture() {
         int[] textures = new int[1];
         GLES20.glGenTextures(1, textures, 0);
 
-        inputTexture = textures[0];
+        int texture = textures[0];
 
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        return texture;
+    }
+
+    private int genOutputTexture(int width, int height) {
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+
+        int texture = textures[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, width, height,
+                0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, null);
+
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+        return texture;
     }
 
     public void updateStatesWithJson(final String statesString) {
