@@ -94,7 +94,9 @@ public class CameraRenderView extends GLSurfaceView implements GLSurfaceView.Ren
         mOutputTexture = genOutputTexture();
         polarrRender.setOutputTexture(mOutputTexture);
 
+//        long startTime = System.currentTimeMillis();
         polarrRender.updateSize(mWidth, mHeight);
+//        Log.d("updateSize", (System.currentTimeMillis() - startTime) + "ms");
 
         //generate camera texture------------------------
         mCameraTexture.init();
