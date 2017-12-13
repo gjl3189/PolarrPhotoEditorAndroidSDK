@@ -357,14 +357,14 @@ path.points = new ArrayList<>();
 // 点坐标数组，需要归一化为 (0,1) 
 path.points.add(new PointF(0.41f, .61f));
 path.points.add(new PointF(0.41f, .68f));
-path.radius = 50;// 点半径坐标，单位为像素
+path.radius = 5;// 点半径坐标，单位为像素, 建议不大于5
 paths.add(path);
   
 path = new MagicEraserPath();
 path.points = new ArrayList<>();
 path.points.add(new PointF(0.31f, .71f));
 path.points.add(new PointF(0.31f, .78f));
-path.radius = 25;
+path.radius = 5;
 paths.add(path);
   
 renderView.renderMagicEraser(paths);

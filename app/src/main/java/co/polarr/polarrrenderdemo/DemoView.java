@@ -9,6 +9,8 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.AttributeSet;
 
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,14 +82,19 @@ public class DemoView extends GLSurfaceView {
             polarrRender.setInputTexture(inputTexture);
 
             outputTexture = genOutputTexture(getWidth(), getHeight());
+
+            outWidth = 2160;
+            outHeight = 1080;
+            updateSize(outputTexture, outWidth, outHeight);
+            polarrRender.updateSize(outWidth, outHeight);
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            BenchmarkUtil.TimeStart("updateSize");
+//            BenchmarkUtil.TimeStart("updateSize");
             // already updated by importImage.
 //            polarrRender.updateSize(width, height);
-            BenchmarkUtil.TimeEnd("updateSize");
+//            BenchmarkUtil.TimeEnd("updateSize");
 //            updateSize(outputTexture, width, height);
         }
 
@@ -95,11 +102,10 @@ public class DemoView extends GLSurfaceView {
         public void onDrawFrame(GL10 gl) {
             polarrRender.drawFrame();
             GLES20.glViewport(0, 0, getWidth(), getHeight());
-
-            demoCopyTexture(polarrRender.getOutputId(), outputTexture, outWidth, outHeight);
+//            demoCopyTexture(polarrRender.getOutputId(), outputTexture, outWidth, outHeight);
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
-            filter.setInputTextureId(outputTexture);
+            filter.setInputTextureId(polarrRender.getOutputId());
             Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
             filter.draw();
 
@@ -108,20 +114,20 @@ public class DemoView extends GLSurfaceView {
                 lastTraceTime = System.currentTimeMillis();
             }
         }
+    }
 
-        private void demoCopyTexture(int src_id, int dest_id, int width, int height) {
-            int[] fbo = new int[1];
-            GLES20.glGenFramebuffers(1, fbo, 0);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
-            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                    GLES20.GL_TEXTURE_2D, src_id, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, dest_id);
-            GLES20.glCopyTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+    private void demoCopyTexture(int src_id, int dest_id, int width, int height) {
+        int[] fbo = new int[1];
+        GLES20.glGenFramebuffers(1, fbo, 0);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, src_id, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, dest_id);
+        GLES20.glCopyTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
-            GLES20.glDeleteFramebuffers(1, fbo, 0);
-        }
+        GLES20.glDeleteFramebuffers(1, fbo, 0);
     }
 
     public void importImage(final Bitmap bitmap) {
@@ -130,16 +136,43 @@ public class DemoView extends GLSurfaceView {
             public void run() {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
-                outWidth = bitmap.getWidth();
+
+//                demoCopyTexture(inputTexture, outputTexture, outWidth, outHeight);
+//                Bitmap bitmap = Bitmap.createBitmap(outWidth, outHeight, Bitmap.Config.ARGB_8888);
+//                bitmap.copyPixelsFromBuffer(readTexture(outputTexture, outWidth, outHeight));
+//                bitmap.recycle();
+
                 outHeight = bitmap.getHeight();
-                polarrRender.updateSize(outWidth, outHeight);
+                outWidth = bitmap.getWidth();
+
                 updateSize(outputTexture, outWidth, outHeight);
+                polarrRender.updateSize(outWidth, outHeight);
+                bitmap.recycle();
 
                 polarrRender.updateInputTexture();
 
-                bitmap.recycle();
+//                demoCopyTexture(inputTexture, outputTexture, outWidth, outHeight);
+//                bitmap = Bitmap.createBitmap(outWidth, outHeight, Bitmap.Config.ARGB_8888);
+//                bitmap.copyPixelsFromBuffer(readTexture(outputTexture, outWidth, outHeight));
+//                bitmap.recycle();
             }
         });
+    }
+
+    private static ByteBuffer readTexture(int texId, int width, int height) {
+        int channels = 4;
+        ByteBuffer ib = ByteBuffer.allocate(width * height * channels);
+        int[] fFrame = new int[1];
+        GLES20.glGenFramebuffers(1, fFrame, 0);
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, texId, 0);
+
+        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, ib);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        GLES20.glDeleteFramebuffers(1, fFrame, 0);
+        return ib;
     }
 
     private int genInputTexture() {

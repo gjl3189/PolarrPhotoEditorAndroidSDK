@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int POINT_BRUSH_MOSIC = 1;
     private static final int POINT_BRUSH_BLUR = 2;
     private static final int POINT_BRUSH_PAINT = 3;
+    private static final int POINT_MAGIC_ERASER = 4;
 
     private static final int TOUCH_FPS = 30;
     private String brushType;
@@ -58,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BrushItem paintBrushItem;
     private BrushItem eraerBrushItem;
-    private int paintState = 0; // 0:idle, 1:paint, 2:eraser
+    private int paintState = 0; // 0:idle, 1:paint, 2:eraser 3:mageic eraser
+    private List<MagicEraserPath> magicEraserPaths;
 
     private AppCompatSeekBar seekbar;
     private TextView labelTv;
@@ -189,6 +191,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void endTouch() {
+        if (currentPointState == POINT_MAGIC_ERASER) {
+            magicErase(currentPoints);
+        }
+
         currentPoints.clear();
         if (currentPointState == POINT_BRUSH_PAINT) {
             if (paintState == 1) {
@@ -218,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     addBrushPaintPoint(point);
                 }
+                break;
+            case POINT_MAGIC_ERASER:
                 break;
         }
         lazyUpdate(TOUCH_FPS);
@@ -337,7 +345,9 @@ public class MainActivity extends AppCompatActivity {
                 showFilters();
                 break;
             case R.id.btn_eraser:
-                setEraser(R.mipmap.person);
+                currentPointState = POINT_MAGIC_ERASER;
+                magicEraserPaths = new ArrayList<>();
+//                setEraser(R.mipmap.person);
                 break;
         }
     }
@@ -350,8 +360,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importImageDemo() {
-//        final Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1), renderRl.getWidth(), renderRl.getHeight());
-        final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo_large);
+        final Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1), renderRl.getWidth(), renderRl.getHeight());
+//        final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo_large);
 
         new Thread() {
             @Override
@@ -398,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
                 renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri);
+                        final Bitmap imageBm = scaledBitmap(decodeBitmapFromUri(MainActivity.this, uri), renderRl.getWidth(), renderRl.getHeight());
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
 
@@ -505,10 +515,20 @@ public class MainActivity extends AppCompatActivity {
         renderView.releaseRender();
     }
 
+    private void magicErase(List<PointF> points) {
+        MagicEraserPath path = new MagicEraserPath();
+        path.points = new ArrayList<>();
+        path.points.addAll(points);
+        path.radius = 5;
+        magicEraserPaths.add(path);
+
+        renderView.renderMagicEraser(magicEraserPaths);
+    }
+
     private void setEraser(final int srcRid) {
         final BitmapFactory.Options option = new BitmapFactory.Options();
         option.inScaled = false;
-        Bitmap imageBm = BitmapFactory.decodeResource(getResources(), srcRid, option);
+        Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), srcRid, option), renderRl.getWidth(), renderRl.getHeight());
 
         renderView.importImage(imageBm);
         renderView.setAlpha(1);
@@ -523,14 +543,14 @@ public class MainActivity extends AppCompatActivity {
                 path.points = new ArrayList<>();
                 path.points.add(new PointF(0.41f, .61f));
                 path.points.add(new PointF(0.41f, .68f));
-                path.radius = 50;
+                path.radius = 5;
                 paths.add(path);
 
                 path = new MagicEraserPath();
                 path.points = new ArrayList<>();
                 path.points.add(new PointF(0.31f, .71f));
                 path.points.add(new PointF(0.31f, .78f));
-                path.radius = 25;
+                path.radius = 5;
                 paths.add(path);
 
                 renderView.renderMagicEraser(paths);
