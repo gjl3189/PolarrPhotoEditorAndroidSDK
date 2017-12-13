@@ -17,6 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import co.polarr.renderer.PolarrRender;
 import co.polarr.renderer.entities.BrushItem;
+import co.polarr.renderer.entities.MagicEraserPath;
 import co.polarr.renderer.filters.Basic;
 
 /**
@@ -45,12 +46,12 @@ public class DemoView extends GLSurfaceView {
         polarrRender = new PolarrRender();
     }
 
-    public void renderMagicEraser(final List<PointF> maskPoints, final float pointRadius) {
+    public void renderMagicEraser(final List<MagicEraserPath> paths) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 BenchmarkUtil.TimeStart("magicEraser");
-                polarrRender.magicEraser(maskPoints, pointRadius);
+                polarrRender.magicEraser(paths);
                 BenchmarkUtil.TimeEnd("magicEraser");
             }
         });

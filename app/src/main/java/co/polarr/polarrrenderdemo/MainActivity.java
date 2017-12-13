@@ -38,6 +38,7 @@ import co.polarr.renderer.entities.Adjustment;
 import co.polarr.renderer.entities.BrushItem;
 import co.polarr.renderer.entities.FilterItem;
 import co.polarr.renderer.entities.FilterPackage;
+import co.polarr.renderer.entities.MagicEraserPath;
 import co.polarr.renderer.utils.QRCodeUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -517,10 +518,22 @@ public class MainActivity extends AppCompatActivity {
         renderView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<PointF> maskPoints = new ArrayList<>();
-                maskPoints.add(new PointF(0.41f, .61f));
-                maskPoints.add(new PointF(0.41f, .68f));
-                renderView.renderMagicEraser(maskPoints, 50);
+                List<MagicEraserPath> paths = new ArrayList<>();
+                MagicEraserPath path = new MagicEraserPath();
+                path.points = new ArrayList<>();
+                path.points.add(new PointF(0.41f, .61f));
+                path.points.add(new PointF(0.41f, .68f));
+                path.radius = 50;
+                paths.add(path);
+
+                path = new MagicEraserPath();
+                path.points = new ArrayList<>();
+                path.points.add(new PointF(0.31f, .71f));
+                path.points.add(new PointF(0.31f, .78f));
+                path.radius = 25;
+                paths.add(path);
+
+                renderView.renderMagicEraser(paths);
 
             }
         }, 2000);

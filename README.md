@@ -341,15 +341,24 @@ renderView.updateStates(localStateMap);
 ```
 ## Magic eraser
 ```java
+List<MagicEraserPath> paths = new ArrayList<>();
+  
+MagicEraserPath path = new MagicEraserPath();
+path.points = new ArrayList<>();
 // mask points (0, 1)
-List<PointF> maskPoints = new ArrayList<>();
-maskPoints.add(new PointF(.39f, .30f));
-maskPoints.add(new PointF(.40f, .33f));
-maskPoints.add(new PointF(.41f, .36f));
+path.points.add(new PointF(0.41f, .61f));
+path.points.add(new PointF(0.41f, .68f));
+path.radius = 50;// point radius in pixel
+paths.add(path);
   
-float radius; // point radius in pixel
+path = new MagicEraserPath();
+path.points = new ArrayList<>();
+path.points.add(new PointF(0.31f, .71f));
+path.points.add(new PointF(0.31f, .78f));
+path.radius = 25;
+paths.add(path);
   
-polarrRender.magicEraser(maskPoints, radius);
+renderView.renderMagicEraser(paths);
 ```
 ## Reset all state
 Reset image to original.
