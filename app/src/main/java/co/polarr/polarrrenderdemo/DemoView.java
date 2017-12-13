@@ -32,6 +32,8 @@ public class DemoView extends GLSurfaceView {
 
     // benchmark
     private long lastTraceTime = 0;
+    private int outWidth;
+    private int outHeight;
 
     public DemoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -77,7 +79,6 @@ public class DemoView extends GLSurfaceView {
             polarrRender.setInputTexture(inputTexture);
 
             outputTexture = genOutputTexture(getWidth(), getHeight());
-            polarrRender.setOutputTexture(outputTexture);
         }
 
         @Override
@@ -86,14 +87,15 @@ public class DemoView extends GLSurfaceView {
             // already updated by importImage.
 //            polarrRender.updateSize(width, height);
             BenchmarkUtil.TimeEnd("updateSize");
-
-            updateSize(outputTexture, width, height);
+//            updateSize(outputTexture, width, height);
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
             polarrRender.drawFrame();
+            GLES20.glViewport(0, 0, getWidth(), getHeight());
 
+            demoCopyTexture(polarrRender.getOutputId(), outputTexture, outWidth, outHeight);
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
             filter.setInputTextureId(outputTexture);
@@ -105,6 +107,20 @@ public class DemoView extends GLSurfaceView {
                 lastTraceTime = System.currentTimeMillis();
             }
         }
+
+        private void demoCopyTexture(int src_id, int dest_id, int width, int height) {
+            int[] fbo = new int[1];
+            GLES20.glGenFramebuffers(1, fbo, 0);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                    GLES20.GL_TEXTURE_2D, src_id, 0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, dest_id);
+            GLES20.glCopyTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+            GLES20.glDeleteFramebuffers(1, fbo, 0);
+        }
     }
 
     public void importImage(final Bitmap bitmap) {
@@ -113,8 +129,14 @@ public class DemoView extends GLSurfaceView {
             public void run() {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, inputTexture);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0);
-                polarrRender.updateSize(bitmap.getWidth(), bitmap.getHeight());
+                outWidth = bitmap.getWidth();
+                outHeight = bitmap.getHeight();
+                polarrRender.updateSize(outWidth, outHeight);
+                updateSize(outputTexture, outWidth, outHeight);
+
                 polarrRender.updateInputTexture();
+
+                bitmap.recycle();
             }
         });
     }

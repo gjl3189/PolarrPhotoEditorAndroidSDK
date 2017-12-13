@@ -349,7 +349,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importImageDemo() {
-        final Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1), renderRl.getWidth(), renderRl.getHeight());
+//        final Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.demo_1), renderRl.getWidth(), renderRl.getHeight());
+        final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.demo_large);
 
         new Thread() {
             @Override
@@ -396,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
                 renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri, renderRl.getWidth(), renderRl.getHeight());
+                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri);
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
 
@@ -438,20 +439,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateRenderLayout(int width, int height) {
+        int viewWidth = renderRl.getWidth();
+        int viewHeight = renderRl.getHeight();
+
+        float scale = Math.min((float) viewWidth / width, (float) viewHeight / height);
+        width *= scale;
+        height *= scale;
+
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) renderView.getLayoutParams();
         rlp.width = width;
         rlp.height = height;
         renderView.setLayoutParams(rlp);
     }
 
-    private static Bitmap decodeBitmapFromUri(Context context, Uri uri, int viewWidth, int viewHight) {
+    private static Bitmap decodeBitmapFromUri(Context context, Uri uri) { //, int viewWidth, int viewHight
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             Bitmap decodedBm = BitmapFactory.decodeStream(inputStream);
             Bitmap formatedBm = decodedBm.copy(Bitmap.Config.ARGB_8888, false);
             decodedBm.recycle();
 
-            return scaledBitmap(formatedBm, viewWidth, viewHight);
+            return formatedBm;//scaledBitmap(formatedBm, viewWidth, viewHight);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -501,9 +509,10 @@ public class MainActivity extends AppCompatActivity {
         option.inScaled = false;
         Bitmap imageBm = BitmapFactory.decodeResource(getResources(), srcRid, option);
 
-        renderView.importImage(scaledBitmap(imageBm, renderRl.getWidth(), renderRl.getHeight()));
+        renderView.importImage(imageBm);
         renderView.setAlpha(1);
 
+        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
         Toast.makeText(this, "Start processing in 2 sec...", Toast.LENGTH_SHORT).show();
         renderView.postDelayed(new Runnable() {
             @Override
@@ -717,8 +726,7 @@ public class MainActivity extends AppCompatActivity {
     private void addBrushPaintPoint(PointF point) {
         if (paintState == 1 && paintBrushItem != null) {
             renderView.addBrushPathPoint(paintBrushItem, point);
-        }
-        else if (paintState == 2 && eraerBrushItem != null) {
+        } else if (paintState == 2 && eraerBrushItem != null) {
             renderView.addBrushPathPoint(eraerBrushItem, point);
         }
     }
