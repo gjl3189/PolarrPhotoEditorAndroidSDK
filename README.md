@@ -310,7 +310,7 @@ brushItem.randomize = 0.25f; // (0, +1f)
 brushItem.erase = false;
 
 brushItem.mode = "paint"; // mask, paint
-brushItem.texture = "stroke_1"; // "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
+brushItem.texture = "stroke_1"; // "stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
   
 List<PointF> touchPoints; // (0,1)
 brushItem.touchPoints.addAll(touchPoints);

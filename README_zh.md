@@ -245,6 +245,20 @@ maskAdjustment.blur = 0.5f;
 
 ```
 ### 渐变蒙版
+```text
+参考坐标系：图片终点为0,0点，x轴正方向向右，y轴正方向向下
+  
+渐变开始线：
+经过startPoint，斜率为 (startPoint[1]-endPoint[1]) / (startPoint[0]-endPoint[0]) * -1，
+渐变结束线：
+经过endPoint，斜率与渐变开始线相同。
+  
+效果作用的区域为三部分：
+1、渐变区域：渐变开始线到渐变结束线围成的区域。
+2、100%作用区域；渐变区域外部，渐变开始线的方向。
+3、非作用区域：渐变区域外部，渐变结束线的方向。
+```
+
 ```java
 Adjustment gradientMask = new Adjustment();
  
@@ -317,7 +331,7 @@ brushItem.interpolate = false; // 是否需要连续
 brushItem.randomize = 0.25f; // 随机化笔触 (0, +1f)
 brushItem.erase = false; // 是否为橡皮
 brushItem.mode = "paint"; // 蒙版笔刷 mask, 贴图笔刷 paint
-brushItem.texture = "stroke_1"; // 笔刷贴图 "stroke_1","stroke_2","stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
+brushItem.texture = "stroke_3"; // 笔刷贴图 "stroke_3","stroke_4","stroke_5","stroke_6","dot","speckles","chalk"
   
 // 笔刷的点坐标数组，需要归一化为(0,1)
 List<PointF> touchPoints;
