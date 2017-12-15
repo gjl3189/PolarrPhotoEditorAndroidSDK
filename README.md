@@ -258,6 +258,7 @@ maskAdjustment.blur = 0.5f;
 ```
 ### Brush mask
 #### Mask brush
+The maximum conut of mask brushes is 4.
 ```java
 Adjustment brushMask = new Adjustment();
  
@@ -293,6 +294,7 @@ maskAdjustment.mosaic_pattern = "dot";// "square","hexagon","dot","triangle","di
 ...
 ```
 #### Paint brush
+The maximum conut of paint brushes is 4.
 ```java
 Adjustment brushMask = new Adjustment();
  

@@ -277,6 +277,7 @@ maskAdjustment.blur = 0.5f;
 ```
 ### 笔刷蒙版
 #### 蒙版笔刷
+蒙版笔刷最多支持4个
 ```java
 Adjustment brushMask = new Adjustment();
  
@@ -315,6 +316,7 @@ maskAdjustment.mosaic_pattern = "dot";// "square","hexagon","dot","triangle","di
 ...
 ```
 #### 贴图笔刷
+贴图笔刷最多支持4个
 ```java
 Adjustment brushMask = new Adjustment();
  
