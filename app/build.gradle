@@ -36,7 +36,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // render engine
-    compile(name: 'renderer-release', ext: 'aar')
+    implementation (name: 'renderer-dev-release', ext: 'aar')
     // face detection
     compile(name: 'dlib-release', ext: 'aar')
     // qr code
