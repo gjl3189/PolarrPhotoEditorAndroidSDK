@@ -150,14 +150,14 @@ public class MainActivity extends AppCompatActivity {
 
                 final Bitmap imageBm = BitmapFactory.decodeResource(getResources(), R.mipmap.person);
 
-                List<String> filterIds = new ArrayList<>();
+                List<Map<String, Object>> filterStates = new ArrayList<>();
                 for (int i = 0; i < 20; i++) {
-                    filterIds.add(mFilters.get((int) (Math.random() * mFilters.size())).id);
+                    filterStates.add(mFilters.get((int) (Math.random() * mFilters.size())).state);
                 }
 
                 BenchmarkUtil.TimeStart("renderBitmap");
 
-                polarrRenderThread.renderBitmap(imageBm, filterIds, new RenderCallback() {
+                polarrRenderThread.renderBitmap(imageBm, filterStates, new RenderCallback() {
                     @Override
                     public void onRenderBitmap(List<Bitmap> bitmapList) {
                         BenchmarkUtil.TimeEnd("renderBitmap");
