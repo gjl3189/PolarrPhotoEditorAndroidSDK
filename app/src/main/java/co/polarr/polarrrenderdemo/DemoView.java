@@ -266,7 +266,8 @@ public class DemoView extends GLSurfaceView {
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                polarrRender.release();
+                polarrRender.releaseGLRes();
+                polarrRender.releaseNonGLRes();
             }
         });
     }

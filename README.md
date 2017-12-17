@@ -376,9 +376,19 @@ polarrRender.updateStates(stateMap);
 int out = polarrRender.getOutputId();
 ```
 ## Release all resource
+It releases both [OpenGL Resources](#relese-opengl-resources) and [Non-OpenGL Resources](#relese-non-opengl-resources)
 ```java
 // call in GL thread
 polarrRender.release();
+```
+### Relese openGl resources
+```java
+// call in GL thread
+polarrRender.releaseGLRes();
+```
+### Relese non-openGl resources
+```java
+polarrRender.releaseNonGLRes();
 ```
 ## Basic global adjustments
 

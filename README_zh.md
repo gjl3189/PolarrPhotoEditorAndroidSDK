@@ -400,9 +400,19 @@ polarrRender.updateStates(stateMap);
 int out = polarrRender.getOutputId();
 ```
 ## 释放资源
+此方法将释放全部资源，包括：[释放OpenGl资源](#释放OpenGl资源)和[释放非OpenGL资源](#释放非OpenGL资源)
 ```java
 // call in GL thread
 polarrRender.release();
+```
+### 释放OpenGl资源
+```java
+// call in GL thread
+polarrRender.releaseGLRes();
+```
+### 释放非OpenGL资源
+```java
+polarrRender.releaseNonGLRes();
 ```
 ## 基本全局调整属性
 
