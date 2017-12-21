@@ -535,6 +535,32 @@ renderView.updateStates(filterItem.state);
 float adjustmentValue = 0.5f; // 滤镜程度 (0f, 1f)
 Map<String, Object> interpolateStates = FilterPackageUtil.GetRefStates(filterItem.state, adjustmentValue);
 ```
+### 内置滤镜说明
+通用系列
+```java
+FilterPackageUtil.F_COMMON_1 // 日系
+FilterPackageUtil.F_COMMON_2 // 自然
+FilterPackageUtil.F_COMMON_3 // 清晰
+FilterPackageUtil.F_COMMON_4 // 海泡岩
+FilterPackageUtil.F_COMMON_5 // 黑白
+FilterPackageUtil.F_COMMON_6 // M1
+```
+前置系列
+```java
+FilterPackageUtil.F_FRONT_1 // 冰沙
+FilterPackageUtil.F_FRONT_2 // 蓝湖
+FilterPackageUtil.F_FRONT_3 // 巴黎10
+FilterPackageUtil.F_FRONT_4 // T2
+FilterPackageUtil.F_FRONT_5 // 缪斯
+```
+后置系列
+```java
+FilterPackageUtil.F_BACK_1 // M3
+FilterPackageUtil.F_BACK_2 // T1
+FilterPackageUtil.F_BACK_3 // C1
+FilterPackageUtil.F_BACK_4 // Electric
+FilterPackageUtil.F_BACK_5 // S109
+ ```
 ## 滤镜二维码
 ### 通过url请求滤镜信息
 ```java
