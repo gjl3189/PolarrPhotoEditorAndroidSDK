@@ -408,11 +408,12 @@ public class MainActivity extends AppCompatActivity {
                 renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        final Bitmap imageBm = scaledBitmap(decodeBitmapFromUri(MainActivity.this, uri), renderRl.getWidth(), renderRl.getHeight());
+//                        final Bitmap imageBm = scaledBitmap(decodeBitmapFromUri(MainActivity.this, uri), renderRl.getWidth(), renderRl.getHeight());
+                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri);
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
 
-                        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
+                        updateRenderLayout(renderRl.getWidth(), renderRl.getHeight());
                     }
                 }, 1000);
             }
