@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private BrushItem paintBrushItem;
     private BrushItem eraerBrushItem;
     private int paintState = 0; // 0:idle, 1:paint, 2:eraser 3:mageic eraser
-    private List<MagicEraserPath> magicEraserPaths;
 
     private AppCompatSeekBar seekbar;
     private TextView labelTv;
@@ -84,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
     private List<FilterItem> mFilters;
     private PolarrRenderThread polarrRenderThread;
     private long lasUpdateTime;
+    private Adjustment currentMask;
+    private BrushItem currentBrushItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
     private void startBrush(int brushState) {
         currentPointState = brushState;
         currentPoints.clear();
+        localMasks.clear();
         updateBrush(null);
         if (currentPointState == POINT_BRUSH_PAINT) {
             setBrushPaint(brushType);
@@ -193,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
     private void endTouch() {
         if (currentPointState == POINT_MAGIC_ERASER) {
             magicErase(currentPoints);
+        }
+        if (currentPointState == POINT_BRUSH_MOSIC) {
+            currentBrushItem = null;
         }
 
         currentPoints.clear();
@@ -344,11 +349,41 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_filters:
                 showFilters();
                 break;
-            case R.id.btn_eraser:
-                currentPointState = POINT_MAGIC_ERASER;
-                magicEraserPaths = new ArrayList<>();
-//                setEraser(R.mipmap.person);
-                break;
+            case R.id.btn_eraser: {
+                AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                final CharSequence items[] = {
+                        "init", "add path", "undo", "redo", "reset"
+                };
+                adb.setItems(items, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int n) {
+                        switch (n) {
+                            case 0:
+                                renderView.initMagicEraser();
+                                break;
+                            case 1:
+                                currentPointState = POINT_MAGIC_ERASER;
+                                break;
+                            case 2:
+                                renderView.undoMagicEraser();
+                                break;
+                            case 3:
+                                renderView.redoMagicEraser();
+                                break;
+                            case 4:
+                                renderView.resetMagicEraser();
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+
+                });
+                adb.setNegativeButton("Cancel", null);
+                adb.setTitle("Choose a function of magic eraser:");
+                adb.show();
+            }
+            break;
         }
     }
 
@@ -408,12 +443,12 @@ public class MainActivity extends AppCompatActivity {
                 renderView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-//                        final Bitmap imageBm = scaledBitmap(decodeBitmapFromUri(MainActivity.this, uri), renderRl.getWidth(), renderRl.getHeight());
-                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri);
+                        final Bitmap imageBm = scaledBitmap(decodeBitmapFromUri(MainActivity.this, uri), renderRl.getWidth(), renderRl.getHeight());
+//                        final Bitmap imageBm = decodeBitmapFromUri(MainActivity.this, uri);
                         renderView.importImage(imageBm);
                         renderView.setAlpha(1);
 
-                        updateRenderLayout(renderRl.getWidth(), renderRl.getHeight());
+                        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
                     }
                 }, 1000);
             }
@@ -520,44 +555,9 @@ public class MainActivity extends AppCompatActivity {
         MagicEraserPath path = new MagicEraserPath();
         path.points = new ArrayList<>();
         path.points.addAll(points);
-        path.radius = 5;
-        magicEraserPaths.add(path);
+        path.radius = 20;
 
-        renderView.renderMagicEraser(magicEraserPaths);
-    }
-
-    private void setEraser(final int srcRid) {
-        final BitmapFactory.Options option = new BitmapFactory.Options();
-        option.inScaled = false;
-        Bitmap imageBm = scaledBitmap(BitmapFactory.decodeResource(getResources(), srcRid, option), renderRl.getWidth(), renderRl.getHeight());
-
-        renderView.importImage(imageBm);
-        renderView.setAlpha(1);
-
-        updateRenderLayout(imageBm.getWidth(), imageBm.getHeight());
-        Toast.makeText(this, "Start processing in 2 sec...", Toast.LENGTH_SHORT).show();
-        renderView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                List<MagicEraserPath> paths = new ArrayList<>();
-                MagicEraserPath path = new MagicEraserPath();
-                path.points = new ArrayList<>();
-                path.points.add(new PointF(0.41f, .61f));
-                path.points.add(new PointF(0.41f, .68f));
-                path.radius = 5;
-                paths.add(path);
-
-                path = new MagicEraserPath();
-                path.points = new ArrayList<>();
-                path.points.add(new PointF(0.31f, .71f));
-                path.points.add(new PointF(0.31f, .78f));
-                path.radius = 5;
-                paths.add(path);
-
-                renderView.renderMagicEraser(paths);
-
-            }
-        }, 2000);
+        renderView.renderMagicEraser(path);
     }
 
     private void setRadialMask() {
@@ -635,45 +635,65 @@ public class MainActivity extends AppCompatActivity {
         if (currentPoints.isEmpty()) {
             return;
         }
-        Adjustment brushMask = new Adjustment();
-        co.polarr.renderer.entities.Context.LocalState maskAdjustment = brushMask.adjustments;
+
+        if (currentMask != null && currentBrushItem != null) {
+            currentBrushItem.touchPoints.clear();
+            currentBrushItem.touchPoints.addAll(currentPoints);
+            renderView.updateBrushPoints(currentBrushItem);
+
+        } else {
+            BrushItem brushItem = new BrushItem();
+
+            brushItem.mode = "mask";  // mask, paint
+            brushItem.blend = false;
+            brushItem.erase = false;
+            brushItem.channel = new float[]{1f, 0f, 0f, 0f}; //rgba
+            brushItem.flow = 0.7f; // (0, +1f)
+            brushItem.size = 0.3f; // (0, +1f)
+            brushItem.spacing = 0.5f;
+            brushItem.hardness = 1f;
+
+            brushItem.touchPoints.addAll(currentPoints);
+            renderView.updateBrushPoints(brushItem);
+
+            if (currentMask != null) {
+                currentMask.brush.add(brushItem);
+            } else {
+                Adjustment brushMask = new Adjustment();
+                co.polarr.renderer.entities.Context.LocalState maskAdjustment = brushMask.adjustments;
 
 //        maskAdjustment.exposure = 0.6f; // (-1f, +1f)
 //        maskAdjustment.temperature = -0.8f; // (-1f, +1f)
-        if (needBlur) {
-            maskAdjustment.blur = 0.5f; // (0, +1f)
+                if (needBlur) {
+                    maskAdjustment.blur = 0.5f; // (0, +1f)
+                }
+                if (mosaicType != null) {
+                    maskAdjustment.mosaic_size = 0.05f; // (0, +1f)
+                    maskAdjustment.mosaic_pattern = mosaicType;// "square","hexagon","dot","triangle","diamond",
+                }
+
+                brushMask.type = "brush";
+                brushMask.brush_mode = "mask"; // mask, paint
+                brushMask.channel = new float[]{1f, 0f, 0f, 0f}; //rgba
+                brushMask.invert = false;
+
+                brushMask.disabled = false;
+
+                brushMask.brush.add(brushItem);
+
+                localMasks.add(brushMask);
+                currentMask = brushMask;
+            }
+
+
+            currentBrushItem = brushItem;
         }
-        if (mosaicType != null) {
-            maskAdjustment.mosaic_size = 0.05f; // (0, +1f)
-            maskAdjustment.mosaic_pattern = mosaicType;// "square","hexagon","dot","triangle","diamond",
-        }
 
-        brushMask.type = "brush";
-        brushMask.brush_mode = "mask"; // mask, paint
-        BrushItem brushItem = new BrushItem();
-        brushMask.brush.add(brushItem);
 
-        brushItem.mode = "mask";  // mask, paint
-        brushItem.blend = false;
-        brushItem.erase = false;
-        brushItem.channel = new float[]{1f, 0f, 0f, 0f}; //rgba
-        brushItem.flow = 0.7f; // (0, +1f)
-        brushItem.size = 0.3f; // (0, +1f)
-        brushItem.spacing = 0.5f;
-        brushItem.hardness = 1f;
-
-        brushItem.touchPoints.addAll(currentPoints);
-
-        brushMask.channel = new float[]{1f, 0f, 0f, 0f}; //rgba
-        brushMask.invert = false;
-
-        brushMask.disabled = false;
-
-        List<Adjustment> localMasks = new ArrayList<>();
-        localMasks.add(brushMask);
         localStateMap.put("local_adjustments", localMasks);
-        renderView.updateBrushPoints(brushItem);
     }
+
+    List<Adjustment> localMasks = new ArrayList<>();
 
     private void setBrushPaint(String paintType) {
         Adjustment brushMask = new Adjustment();
@@ -952,6 +972,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideAll() {
+        currentMask = null;
         findViewById(R.id.tv_desc).setVisibility(View.GONE);
         stopBrush();
         sliderCon.setVisibility(View.INVISIBLE);

@@ -48,13 +48,47 @@ public class DemoView extends GLSurfaceView {
         polarrRender = new PolarrRender();
     }
 
-    public void renderMagicEraser(final List<MagicEraserPath> paths) {
+    public void initMagicEraser() {
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                BenchmarkUtil.TimeStart("magicEraser");
-                polarrRender.magicEraser(paths);
-                BenchmarkUtil.TimeEnd("magicEraser");
+                polarrRender.magicEraserInit();
+            }
+        });
+    }
+
+    public void undoMagicEraser() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.magicEraserUndo();
+            }
+        });
+    }
+
+    public void redoMagicEraser() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.magicEraserRedo();
+            }
+        });
+    }
+
+    public void resetMagicEraser() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.magicEraserReset();
+            }
+        });
+    }
+
+    public void renderMagicEraser(final MagicEraserPath path) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                polarrRender.magicEraserStep(path);
             }
         });
     }
@@ -82,11 +116,7 @@ public class DemoView extends GLSurfaceView {
             polarrRender.setInputTexture(inputTexture);
 
             outputTexture = genOutputTexture(getWidth(), getHeight());
-
-            outWidth = 2160;
-            outHeight = 1080;
-            updateSize(outputTexture, outWidth, outHeight);
-            polarrRender.updateSize(outWidth, outHeight);
+            polarrRender.setOutputTexture(outputTexture);
         }
 
         @Override
@@ -105,7 +135,7 @@ public class DemoView extends GLSurfaceView {
 //            demoCopyTexture(polarrRender.getOutputId(), outputTexture, outWidth, outHeight);
             // demo draw screen
             Basic filter = Basic.getInstance(getResources());
-            filter.setInputTextureId(polarrRender.getOutputId());
+            filter.setInputTextureId(outputTexture);
             Matrix.scaleM(filter.getMatrix(), 0, 1, -1, 1);
             filter.draw();
 
@@ -268,6 +298,7 @@ public class DemoView extends GLSurfaceView {
             public void run() {
                 polarrRender.releaseGLRes();
                 polarrRender.releaseNonGLRes();
+                polarrRender = null;
             }
         });
     }
