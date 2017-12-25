@@ -342,25 +342,39 @@ localStateMap.put("local_adjustments", localMasks);
 renderView.updateStates(localStateMap);
 ```
 ## Magic eraser
+### Init magic eraser
+Set the original image of magic eraser by the inputTexture of PolarrRender.  
+Clear All histories and caches.
 ```java
-List<MagicEraserPath> paths = new ArrayList<>();
-  
+// On GL thread
+polarrRender.magicEraserInit();
+```
+### Magic erase a path
+```java
+List<PointF> points; // mask points (0.0f, 1.0f)
 MagicEraserPath path = new MagicEraserPath();
 path.points = new ArrayList<>();
-// mask points (0, 1)
-path.points.add(new PointF(0.41f, .61f));
-path.points.add(new PointF(0.41f, .68f));
-path.radius = 50;// point radius in pixel
-paths.add(path);
+path.points.addAll(points);
+path.radius = 20; // radius of each points，pixel
   
-path = new MagicEraserPath();
-path.points = new ArrayList<>();
-path.points.add(new PointF(0.31f, .71f));
-path.points.add(new PointF(0.31f, .78f));
-path.radius = 25;
-paths.add(path);
-  
-renderView.renderMagicEraser(paths);
+// On GL thread
+polarrRender.magicEraserStep(path);
+```
+### Undo
+The maximum times of undo is 10.
+```java
+// On GL thread
+polarrRender.magicEraserUndo();
+```
+### Redo
+```java
+// On GL thread
+polarrRender.magicEraserRedo();
+```
+### Reset to init
+```java
+// On GL thread
+polarrRender.magicEraserReset();
 ```
 ## Reset all state
 Reset image to original.

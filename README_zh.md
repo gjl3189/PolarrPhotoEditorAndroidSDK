@@ -364,26 +364,41 @@ localStateMap.put("local_adjustments", localMasks);
 renderView.updateStates(localStateMap);
 ```
 ## 消除笔
+### 初始化消除笔
+会将inputTexture设置为消除笔原始图片，并清空全部历史记录及缓存。
 ```java
-// 所有需要消除部分的区域。
-List<MagicEraserPath> paths = new ArrayList<>();
-  
+// On GL thread
+polarrRender.magicEraserInit();
+```
+### 消除一个路径内的物体
+每次消除时会根据上一次的结果进行消除处理。
+```java
+List<PointF> points; // 归一化的点坐标数组，每个PointF的x、y取值为 (0.0f, 1.0f)
 MagicEraserPath path = new MagicEraserPath();
 path.points = new ArrayList<>();
-// 点坐标数组，需要归一化为 (0,1) 
-path.points.add(new PointF(0.41f, .61f));
-path.points.add(new PointF(0.41f, .68f));
-path.radius = 5;// 点半径坐标，单位为像素, 建议不大于5
-paths.add(path);
+path.points.addAll(points);
+path.radius = 20; // 点半径，单位：像素px
   
-path = new MagicEraserPath();
-path.points = new ArrayList<>();
-path.points.add(new PointF(0.31f, .71f));
-path.points.add(new PointF(0.31f, .78f));
-path.radius = 5;
-paths.add(path);
-  
-renderView.renderMagicEraser(paths);
+// On GL thread
+polarrRender.magicEraserStep(path);
+```
+### 撤销
+最大撤销次数为10次。超过撤销次数，该方法无效果。
+```java
+// On GL thread
+polarrRender.magicEraserUndo();
+```
+### 重做
+当重做到最新一步时，该方法无效果。
+```java
+// On GL thread
+polarrRender.magicEraserRedo();
+```
+### 还原到消除笔到初始化状态
+还原当前的图片为初始化时的状态。
+```java
+// On GL thread
+polarrRender.magicEraserReset();
 ```
 ## 重置图片
 重置图片为原始状态
