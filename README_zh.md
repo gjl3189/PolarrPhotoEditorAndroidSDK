@@ -383,12 +383,21 @@ path.radius = 20; // 点半径，单位：像素px
 polarrRender.magicEraserStep(path);
 ```
 ### 撤销
-最大撤销次数为10次。超过撤销次数，该方法无效果。
+最大撤销次数为10次。
+检查是否可以撤销
+```java
+boolean canUndo = polarrRender.magicEraserCanUndo();
+```
+超过撤销次数，该方法无效果。
 ```java
 // On GL thread
 polarrRender.magicEraserUndo();
 ```
 ### 重做
+检查是否可以重做
+```java
+boolean canRedo = polarrRender.magicEraserCanRedo();
+```
 当重做到最新一步时，该方法无效果。
 ```java
 // On GL thread

@@ -363,10 +363,16 @@ polarrRender.magicEraserStep(path);
 ### Undo
 The maximum times of undo is 10.
 ```java
+boolean canUndo = polarrRender.magicEraserCanUndo();
+```
+```java
 // On GL thread
 polarrRender.magicEraserUndo();
 ```
 ### Redo
+```java
+boolean canRedo = polarrRender.magicEraserCanRedo();
+```
 ```java
 // On GL thread
 polarrRender.magicEraserRedo();
